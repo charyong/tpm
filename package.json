@@ -17,7 +17,9 @@
 	"dependencies": {
 		"optimist": "~0.3.5",
 		"iconv-lite": "~0.2.5",
-		"request": "~2.12.0",
-		"less": "~1.4.0-b2"
+		"jsftp": "~0.5.9",
+		"less": "~1.4.0-b2",
+		"ozma-tudou": ">=1.4.3",
+		"uglify-js": "~2.2.1"
 	}
 }

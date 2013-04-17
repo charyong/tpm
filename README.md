@@ -18,7 +18,7 @@ TPM是前端打包工具。
 ## 使用方法
 
 ```bash
-tpm [COMMAND] [PATH]
+tpm [command]
 ```
 
 ### 构建JS
@@ -45,6 +45,13 @@ tpm build src/embed/storage.html
 tpm build src/img
 ```
 
+### 指定配置
+用config参数指定配置，默认用当前目录下的`config.json`。
+
+```bash
+tpm build src/js/g.js --config=my-config.json
+```
+
 ### 整理build、dist目录
 
 删除build、dist里的多余的目录和文件夹。
@@ -53,7 +60,7 @@ tpm build src/img
 tpm clear
 ```
 
-### config.json配置
+### 配置说明
 
 * main：JS和CSS入口文件。
 * libjs：全局非AMD文件。
