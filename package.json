@@ -1,0 +1,23 @@
+{
+	"name": "tpm",
+	"version": "1.0.0",
+	"description": "Static Package Manager",
+	"author": "Longhao Luo <lhluo@tudou.com>",
+	"license": "GPL",
+	"bin" : {
+		"tpm": "./tpm"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/tudouui/tpm.git"
+	},
+	"keywords": [
+		"frontend", "static", "package", "builder"
+	],
+	"dependencies": {
+		"optimist": "~0.3.5",
+		"iconv-lite": "~0.2.5",
+		"request": "~2.12.0",
+		"less": "~1.4.0-b2"
+	}
+}
