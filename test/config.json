@@ -12,7 +12,7 @@
 		"tui/drag",
 		"tui/mask",
 		"tui/widget",
-		"tui/dialog",
+		"tui/dialog"
 	],
 	"main" : {
 		"js" : [

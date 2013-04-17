@@ -1,5 +1,4 @@
 
-var Path = require('path');
 var Fs = require('fs');
 var Iconv = require('iconv-lite');
 
@@ -13,10 +12,6 @@ function each(obj, fn) {
 		}
 
 	}
-}
-
-function isRegExp(val) {
-	return Object.prototype.toString.call(val) === '[object RegExp]';
 }
 
 function undef(val, defaultVal) {
@@ -54,7 +49,6 @@ function readFileSync(filePath, encoding) {
 }
 
 exports.each = each;
-exports.isRegExp = isRegExp;
 exports.undef = undef;
 exports.info = info;
 exports.warn = warn;
