@@ -24,32 +24,32 @@ tpm [command]
 ### 构建JS
 
 ```bash
-tpm build src/js/g.js
-tpm build src/js/page/demo.js
-tpm build src/js
+tpm src/js/g.js
+tpm src/js/page/demo.js
+tpm src/js
 ```
 
 ### 构建LESS
 
 ```bash
-tpm build src/css/g.less
-tpm build src/css/page/demo.less
-tpm build src/css
+tpm src/css/g.less
+tpm src/css/page/demo.less
+tpm src/css
 ```
 
 ### 构建图片、embed
 
 ```bash
-tpm build src/img/demo.png
-tpm build src/embed/storage.html
-tpm build src/img
+tpm src/img/demo.png
+tpm src/embed/storage.html
+tpm src/img
 ```
 
 ### 指定配置
 用config参数指定配置，默认用当前目录下的`config.json`。
 
 ```bash
-tpm build src/js/g.js --config=my-config.json
+tpm src/js/g.js --config=my-config.json
 ```
 
 ### 整理build、dist目录
