@@ -20,6 +20,7 @@
 		"jsftp": "~0.5.9",
 		"less": "~1.4.0-b2",
 		"ozma-tudou": ">=1.4.3",
-		"uglify-js": "~2.2.1"
+		"uglify-js": "~2.2.1",
+		"underscore": "~1.4.4"
 	}
 }

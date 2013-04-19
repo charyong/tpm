@@ -37,15 +37,10 @@ if (ARGV.version || ARGV.v) {
 	process.exit();
 }
 
-if (ARGV._.length < 1) {
-	Optimist.showHelp();
-	process.exit();
-}
-
 var cmd;
 var args;
 
-if (TASK_MAP[ARGV._[0]]) {
+if (ARGV._.length > 0 && TASK_MAP[ARGV._[0]]) {
 	cmd = ARGV._[0];
 	args = ARGV._.slice(1);
 } else {
@@ -53,23 +48,45 @@ if (TASK_MAP[ARGV._[0]]) {
 	args = ARGV._;
 }
 
-var config = {};
+var config = null;
 
-var dirPath = args.length > 0 ? Path.dirname(args[0]) : '.';
+var dirPath = args.length > 0 ? args[0] : '.';
+
+if (!Fs.existsSync(dirPath)) {
+	Util.error('File not found: ' + dirPath);
+	process.exit();
+}
+
+var dirStat = Fs.statSync(dirPath);
+
+if (!dirStat.isDirectory()) {
+	dirPath = Path.dirname(dirPath);
+}
+
+dirPath = Path.resolve(dirPath);
 
 while (true) {
-	var path = Util.undef(ARGV.config, dirPath + '/config.json');
+	var path = Util.undef(ARGV.config, dirPath + '/tpm-config.js');
+
+	path = Path.resolve(path);
 
 	if (Fs.existsSync(path)) {
-		config = JSON.parse(Util.readFileSync(path, 'utf-8'));
+		config = require(path);
 		break;
 	}
 
-	if (Path.resolve(dirPath + '/../') == dirPath) {
+	var parentPath = Path.resolve(dirPath + '/../');
+
+	if (parentPath == dirPath) {
 		break;
 	}
 
-	dirPath = Path.resolve(dirPath + '/../');
+	dirPath = parentPath;
+}
+
+if (config === null) {
+	Util.error('File not found: tpm-config.js');
+	process.exit();
 }
 
 var Task = require(__dirname + '/tasks/' + cmd);
