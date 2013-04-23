@@ -17,10 +17,6 @@ exports.ignore = [
 	"tui/dialog"
 ];
 
-exports.global = [
-	"g.js"
-];
-
 exports.main = {
 	"js" : [
 		"lib.js",
@@ -33,6 +29,11 @@ exports.main = {
 	]
 };
 
-exports.lib = {
+exports.libjs = {
 	"lib.js" : ["lib/jquery.js", "lib/fix.js", "lib/oz.js", "lib/config.js"]
 };
+
+
+exports.globaljs = [
+	"g.js"
+];
