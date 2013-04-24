@@ -75,7 +75,7 @@ while (true) {
 		break;
 	}
 
-	var parentPath = Path.resolve(dirPath + '/../');
+	var parentPath = Path.dirname(dirPath);
 
 	if (parentPath == dirPath) {
 		break;

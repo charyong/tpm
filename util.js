@@ -1,14 +1,17 @@
 
+var Path = require('path');
 var Fs = require('fs');
 var Iconv = require('iconv-lite');
-var uglifyjs = require('uglify-js');
+var UglifyJs = require('uglify-js');
+var CleanCss = require('clean-css');
+var ChildProcess = require('child_process');
 
-var uglifyParser = uglifyjs.parser;
-var uglifyPro = uglifyjs.uglify;
+var uglifyParser = UglifyJs.parser;
+var uglifyPro = UglifyJs.uglify;
 
 var linefeed = process.platform === 'win32' ? '\r\n' : '\n';
 
-var BANNER = '/**\n' +
+var banner = '/**\n' +
 	' * @modified $Author$\n' +
 	' * @version $Rev$\n' +
 	' */\n';
@@ -41,6 +44,31 @@ function error(str) {
 	console.error('\033[31m', str, '\033[0m');
 }
 
+function mkdir(dirPath, mode) {
+	var list = [];
+	while (true) {
+		if (Fs.existsSync(dirPath)) {
+			break;
+		}
+
+		list.push(dirPath);
+
+		var parentPath = Path.dirname(dirPath);
+
+		if (parentPath == dirPath) {
+			break;
+		}
+
+		dirPath = parentPath;
+	}
+
+	list.reverse().forEach(function(path) {
+		Fs.mkdirSync(path, mode);
+
+		info('Directory "' + path + '" created.' + linefeed);
+	});
+}
+
 function readFileSync(filePath, encoding) {
 	var buffer = new Buffer('');
 
@@ -59,14 +87,19 @@ function readFileSync(filePath, encoding) {
 	return fileStr;
 }
 
+function writeFileSync(filePath, content) {
+	mkdir(Path.dirname(filePath), '0777');
+	Fs.writeFileSync(filePath, content);
+}
+
 function copyFile(fromPath, toPath) {
 	console.log('Copy file: ' + fromPath);
 
 	var content = readFileSync(fromPath, 'utf-8');
 
-	Fs.writeFileSync(toPath, content);
+	writeFileSync(toPath, content);
 
-	console.log('File "' + toPath + '" created.' + linefeed);
+	info('File "' + toPath + '" created.' + linefeed);
 }
 
 function minJs(fromPath, toPath) {
@@ -79,9 +112,21 @@ function minJs(fromPath, toPath) {
 	ast = uglifyPro.ast_squeeze(ast);
 	var minContent = uglifyPro.gen_code(ast) + ';'; // compressed code
 
-	Fs.writeFileSync(toPath, BANNER + minContent);
+	writeFileSync(toPath, banner + minContent);
 
-	console.log('File "' + toPath + '" created.' + linefeed);
+	info('File "' + toPath + '" created.' + linefeed);
+}
+
+function minCss(fromPath, toPath) {
+	console.log('Compress file: ' + fromPath);
+
+	var content = readFileSync(fromPath, 'utf-8');
+
+	var minContent = CleanCss.process(content);
+
+	writeFileSync(toPath, banner + minContent);
+
+	info('File "' + toPath + '" created.' + linefeed);
 }
 
 function concatFile(fromPaths, toPath) {
@@ -95,18 +140,35 @@ function concatFile(fromPaths, toPath) {
 		contentList.push(readFileSync(path, 'utf-8'));
 	});
 
-	Fs.writeFileSync(toPath, BANNER + contentList.join(linefeed));
+	writeFileSync(toPath, banner + contentList.join(linefeed));
 
-	console.log('File "' + toPath + '" created.' + linefeed);
+	info('File "' + toPath + '" created.' + linefeed);
+}
+
+function setSvnKeywords(path) {
+	var cmd = 'svn propset svn:keywords "Rev LastChangedDate Author URL" "' + path.replace(/\\/g, '\\\\') + '"';
+
+	console.log(cmd);
+
+	ChildProcess.exec(cmd, function(err, stdout, stderr){
+		if (err !== null) {
+			return error('[SVN] ' + err);
+		}
+	});
 }
 
 exports.linefeed = linefeed;
+exports.banner = banner;
 exports.each = each;
 exports.undef = undef;
 exports.info = info;
 exports.warn = warn;
 exports.error = error;
+exports.mkdir = mkdir;
 exports.readFileSync = readFileSync;
+exports.writeFileSync = writeFileSync;
 exports.copyFile = copyFile;
 exports.minJs = minJs;
+exports.minCss = minCss;
 exports.concatFile = concatFile;
+exports.setSvnKeywords = setSvnKeywords;

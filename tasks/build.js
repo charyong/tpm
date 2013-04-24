@@ -3,6 +3,7 @@ var Path = require('path');
 var Fs = require('fs');
 var _ = require('underscore');
 var Ozma = require('ozma-tudou').Ozma;
+var Less = require('less');
 
 var Util = require(__dirname + '/../util');
 
@@ -17,13 +18,13 @@ exports.run = function(args, config) {
 	// 获取build路径
 	function getBuildPath(path) {
 		var relativePath = getRelativePath(path);
-		return Path.resolve(config.root + '/build/' + relativePath);
+		return Path.resolve(config.root + '/build/' + relativePath.replace(/\.less$/, '.css'));
 	}
 
 	// 获取dist路径
 	function getDistPath(path) {
 		var relativePath = getRelativePath(path);
-		return Path.resolve(config.root + '/dist/' + relativePath);
+		return Path.resolve(config.root + '/dist/' + relativePath.replace(/\.less$/, '.css'));
 	}
 
 	// 是否可构建的文件
@@ -44,6 +45,8 @@ exports.run = function(args, config) {
 	// 构建一个JS文件
 	function buildJs(path) {
 		var relativePath = getRelativePath(path, 'js');
+		var buildPath = getBuildPath(path);
+		var distPath = getDistPath(path);
 
 		// 把多个文件合并成一个文件
 		if (config.libjs[relativePath]) {
@@ -51,11 +54,10 @@ exports.run = function(args, config) {
 				return Path.resolve(config.root + '/src/js/' + val);
 			});
 			Util.concatFile(fromPaths, path);
-
-			var buildPath = getBuildPath(path);
-			var distPath = getDistPath(path);
 			Util.copyFile(path, buildPath);
 			Util.minJs(buildPath, distPath);
+			Util.setSvnKeywords(buildPath);
+			Util.setSvnKeywords(distPath);
 			return;
 		}
 
@@ -79,13 +81,30 @@ exports.run = function(args, config) {
 		options._ = [path];
 
 		Ozma()(options, function() {
-			// done
+			Util.setSvnKeywords(buildPath);
+			Util.setSvnKeywords(distPath);
 		});
 	}
 
 	// 构建一个LESS文件
 	function buildLess(path) {
+		var buildPath = getBuildPath(path);
+		var distPath = getDistPath(path);
 
+		var content = Util.readFileSync(path, 'utf-8');
+
+		var parser = new(Less.Parser)({
+			paths : ['.', config.root + '/src/css'],
+			filename : path,
+		});
+
+		parser.parse(content, function(err, tree) {
+			if (err) {
+				return Util.error(err);
+			}
+			Util.writeFileSync(buildPath, Util.banner + tree.toCSS());
+			Util.minCss(buildPath, distPath);
+		});
 	}
 
 	// 构建一个图片文件

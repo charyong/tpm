@@ -1,0 +1,149 @@
+
+/**
+ * TUI Dialog Style
+ */
+.tui_dialog {
+	background: #fff;
+	*background: #fff url("@{imgPath}/g/ui/panel/ba.png") -10000px 0 no-repeat;
+	-webkit-box-shadow: 1px 6px 36px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 1px 6px 36px rgba(0, 0, 0, 0.5);
+	box-shadow: 1px 6px 36px rgba(0, 0, 0, 0.5);
+	-webkit-border-radius: 5px 5px 3px 3px;
+	-moz-border-radius: 5px 5px 3px 3px;
+	border-radius: 5px 5px 3px 3px;
+	position: absolute;
+	top: -10000px;
+}
+.tui_dialog_holder { width: 450px; }
+
+/* ie style ====================== */
+.tui_dialog_wrap { border-left: 4px solid #e9e9e9; border-right: 4px solid #e9e9e9; }
+.tui_dialog_wrap .tui_dialog_holder { background: #fff; position: relative; }
+.tui_dialog_wrap .tui_dialog_w_tp,
+.tui_dialog_wrap .tui_dialog_w_bm { width: 100%; height: 4px; font-size: 0; background: #e9e9e9; position: absolute; top: -4px; }
+.tui_dialog_wrap .tui_dialog_w_bm { top: auto; bottom: -4px; }
+.tui_dialog_wrap .tui_dialog_w_tl,
+.tui_dialog_wrap .tui_dialog_w_tr,
+.tui_dialog_wrap .tui_dialog_w_bl,
+.tui_dialog_wrap .tui_dialog_w_br { width: 5px; height: 5px; background: url("@{imgPath}/g/ui/panel/ba.png") 0 0 no-repeat; _background-image: url("@{imgPath}/g/ui/panel/pimg.png"); position: absolute; z-index: 1; font-size: 0; }
+.tui_dialog_wrap .tui_dialog_w_tl { top: -4px; left: -4px; }
+.tui_dialog_wrap .tui_dialog_w_tr { top: -4px; right: -4px; background-position: -5px 0; }
+.tui_dialog_wrap .tui_dialog_w_bl { bottom: -4px; left: -4px; background-position: 0 -5px; }
+.tui_dialog_wrap .tui_dialog_w_br { bottom: -4px; right: -4px; background-position: -5px -5px; }
+
+.tui_dialog_wrap { _border-bottom: 4px solid #e9e9e9; }
+.tui_dialog_wrap .tui_dialog_w_bm,
+.tui_dialog_wrap .tui_dialog_w_bl,
+.tui_dialog_wrap .tui_dialog_w_br { _display: none; }
+
+.tudou_dialog .tui_dialog_wrap { border-color: #ccc; }
+.tudou_dialog .tui_dialog_wrap .tui_dialog_w_tp,
+.tudou_dialog .tui_dialog_wrap .tui_dialog_w_bm { background: #ccc; }
+.tudou_dialog .tui_dialog_wrap .tui_dialog_w_tl { background-position: -10px 0; }
+.tudou_dialog .tui_dialog_wrap .tui_dialog_w_tr { background-position: -15px 0; }
+.tudou_dialog .tui_dialog_wrap .tui_dialog_w_bl { background-position: -10px -5px; }
+.tudou_dialog .tui_dialog_wrap .tui_dialog_w_br { background-position: -15px -5px; }
+/* end =========================== */
+
+.tui_dialog_header {
+	height: 28px; background: #808080 url("@{imgPath}/g/ui/panel/pimg.png") 0 -35px repeat-x;
+	-webkit-border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
+	border-radius: 3px 3px 0 0;
+	overflow: hidden;
+}
+.tui_dialog_title {
+	padding: 0 27px 0 10px;
+	font-size: 12px; font-weight: bold;
+	line-height: 28px; *line-height: 29px;
+	cursor: default; color: #fff;
+}
+.tui_dialog_close {
+	float: right;
+	width: 15px;
+	height: 15px;
+	margin: 7px 6px 0;
+	background: url("@{imgPath}/g/ui/panel/pimg.png") -28px 2px no-repeat;
+	text-indent: -3000px;
+	cursor: pointer;
+	outline: none;
+}
+.tui_dialog_close:hover { background-position: -48px 2px; }
+.tui_dialog_content { overflow: auto; }
+.tui_dialog_content,
+.tui_dialog_footer,
+.tui_dialog_info,
+.tui_dialog_itxt {
+	-webkit-border-radius: 0 0 3px 3px;
+	-moz-border-radius: 0 0 3px 3px;
+	border-radius: 0 0 3px 3px;
+}
+.tui_dialog_info { position: relative; background: #f7f7f7; color: #808080; word-wrap: break-word; }
+.tui_dialog_info .tui_dialog_itxt { padding: 9px 13px 7px; line-height: 17px; }
+
+.td_iframe_panel .tui_dialog_content { overflow: hidden; }
+
+/* TUI.panel */
+.tudou_dialog { position: fixed; cursor: default; }
+.tudou_dialog .tui_dialog_content { overflow: hidden; _height: 150px; color: #404040; }
+.tudou_dialog .tui_dialog_footer { height: 63px; clear: both; }
+.tudou_dialog .tui_dialog_logo { width: 80px; height: 80px; margin: 5px 0 0 10px; _margin-left: 5px; background: url("@{imgPath}/g/ui/panel/plogo.png") 0 0 no-repeat; float: left; }
+.tudou_dialog .tui_dialog_text { margin: 0 0 0 105px; padding: 24px 25px 0 0; line-height: 160%; }
+.tudou_dialog .tui_dialog_button { height: 31px; padding: 17px 12px 15px 22px; text-align: center; }
+.tudou_dialog .tui_dialog_button a {
+	display: inline-block; width: 90px; height: 31px; margin-right: 10px; line-height: 31px; *line-height: 33px;
+	background: url("@{imgPath}/g/ui/panel/pimg.png") 0 -70px no-repeat;
+	text-align: center; color: #202020; text-decoration: none; overflow: hidden; outline: none;
+}
+/* .tudou_dialog .tui_dialog_button a.p_btn_0, */
+.tudou_dialog .tui_dialog_button a:hover { background-position: 0 -105px; }
+.tudou_dialog .tui_dialog_button a:active { background-position: 0 -140px; }
+.tudou_dialog .tui_dialog_button .p_btn_l a { width: 120px; background-position: -90px -70px; }
+.tudou_dialog .tui_dialog_button .p_btn_l a:hover { background-position: -90px -105px; }
+.tudou_dialog .tui_dialog_button .p_btn_l a:active { background-position: -90px -140px; }
+
+.alert .tui_dialog_logo {}
+.confirm .tui_dialog_logo {}
+.custom .tui_dialog_logo {}
+.finish .tui_dialog_logo { background-position: -80px 0; }
+
+
+/* 带箭头的文字提示框 */
+.t_prompt{width:250px;padding:0;z-index:110000;position:absolute;cursor:pointer;}
+.t_prompt .myarrow{padding:24px 0 0 0;background:url("@{imgPath}/g/ui/tips/prompt_arrow2.png") no-repeat top right;}
+.t_prompt .myarrow div{border:1px solid #CED459;background:#F3FE81;color:#333;padding:15px;line-height:170%}
+.t_prompt .myarrow div em{font-style:normal;color:#f00;}
+
+/* mes_box 自适应消息框 */
+.tui_mesbox{position:absolute;right:0;top:66px;z-index:1}
+.tui_mesbox,.tui_mesbox td{margin:0;padding:0;border:none;border-collapse:collapse}
+.tui_mesbox .round{width:2px;height:2px;background:url("@{imgPath}/g/mes_box.png") no-repeat}
+.tui_mesbox .left_top{background-position:1px 1px}
+.tui_mesbox .right_top{background-position:0 1px}
+.tui_mesbox .left_bottom{background-position:1px 0}
+.tui_mesbox .line{height:2px;background:url("@{imgPath}/g/mes_box.png") repeat-x}
+.tui_mesbox .top{background-position:0 -17px}
+.tui_mesbox .bottom{background-position:0 -20px}
+.tui_mesbox .left,.tui_mesbox .right{background:#fc0}
+.tui_mesbox .container{position:relative;margin:0 -1px;padding:5px 10px;padding-right:20px;background:#ffc;line-height:1.8;zoom:1}
+.tui_mesbox .container li a{text-decoration:underline;}
+.tui_mesbox .arrow{position:absolute;left:10px;top:-7px;width:11px;height:7px;background:url("@{imgPath}/g/mes_box.png") no-repeat -11px 0;overflow:hidden}
+.tui_mesbox .close{position:absolute;right:5px;top:5px;display:block;width:9px;height:9px;background:url("@{imgPath}/g/mes_box.png") no-repeat -83px 0;overflow:hidden}
+
+.g-mini .tui_mesbox{top: 35px;}
+
+
+#gTop .tui_mesbox .round,#gTop .tui_mesbox .round{width:2px;height:2px;background:url("@{imgPath}/g/notes.png") no-repeat}
+#gTop .tui_mesbox .line{height:2px;background:url("@{imgPath}/g/notes.png") repeat-x}
+#gTop .tui_mesbox .left_top{background-position:-10px 0}
+#gTop .tui_mesbox .right_top{background-position:-13px 0}
+#gTop .tui_mesbox .right_bottom{background-position:-16px 0}
+#gTop .tui_mesbox .left_bottom{background-position:-19px 0}
+#gTop .tui_mesbox .top{background-position:0 -10px}
+#gTop .tui_mesbox .bottom{background-position:0 -13px}
+#gTop .tui_mesbox .left,#gTop .tui_mesbox .right{background:#e2d9ca}
+#gTop .tui_mesbox .container{background:#fefee2}
+#gTop .tui_mesbox .container a{color:#3788b6}
+#gTop .tui_mesbox .container a:hover{color:#f60}
+#gTop .tui_mesbox .close{top:11px;background:url("@{imgPath}/g/notes.png") no-repeat 0 0;}
+#gTop .tui_mesbox_wrap{width: 980px; left: 50%; margin-left: -490px; top: 0; position: absolute; z-index: 10005; }

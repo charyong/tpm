@@ -1,0 +1,33 @@
+/* tui_bubble_dialog */
+.tui_bubble_dialog{ box-shadow:none; -moz-box-shadow:none; -webkit-box-shadow:none; overflow:hidden;}
+.tui_bubble_dialog .tui_dialog_holder{width: auto; position: relative; z-index: 1; background: #fff; -moz-border-radius: 3px; border-radius: 3px; border:4px solid #e0e0e0;}
+.tui_bubble_dialog .tui_dialog_header{ display:none;}
+.tui_bubble_dialog .tui_dialog_content{ padding-bottom:12px; text-align:center; color:#404040; padding:15px 28px 12px 28px;}
+
+.tui_bubble_dialog .tui_dialog_button{ text-align:center; padding-bottom:10px;}
+.tui_bubble_dialog .tui_dialog_button a{
+	padding:0 15px;
+    line-height: 27px;
+	line-height:29px\9;
+	border:1px solid #e6e6e6;
+    display: inline-block;
+    overflow: hidden;
+    text-align: center;
+    text-decoration: none;
+	margin:0 3px 3px 3px;
+	background-color:#f7f7f7;
+	color:#404040;
+	border-radius:3px;
+	position:relative;	/*fix ie6,7æ”÷–*/
+}
+.tui_bubble_dialog .tui_dialog_button a:hover{ background-color:#fbfbfb;}
+ 
+ /* fix ie */
+.tui_bubble_dialog .tui_dialog_holder iframe{ width:auto; display:none;}
+.tui_bubble_dialog .tui_dialog_wrap{ border:none;}
+.tui_bubble_dialog .tui_panel_mask,
+.tui_bubble_dialog .tui_dialog_resize,
+.tui_bubble_dialog .tui_dialog_w_tp,
+.tui_bubble_dialog .tui_dialog_w_lf,
+.tui_bubble_dialog .tui_dialog_w_tl,
+.tui_bubble_dialog .tui_dialog_w_bl{ display:none;}

@@ -1,0 +1,123 @@
+
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td {
+	margin:0;
+	padding:0;
+}
+body {
+	color: #000;
+	background: #fff;
+	font-size: 12px;   /* 将1em定义为12px，除表单元素以外的所有元素都会继承 */
+	line-height: 1.25; /* 12px字体行高15px，这样FF下Tahoma的下划线才会出来 */
+	font-family: ~"tahoma,arial,\5b8b\4f53,sans-serif"; /* 除表单元素以外的所有元素都会继承 */
+}
+
+th, td {
+	/* 让表格里的内容左对齐、上对齐 */
+	text-align:left;
+	vertical-align: top;
+}
+h1, h2, h3, h4, h5, h6 {
+	/* 这几个标签在不同的浏览器里默认的大小不一样，不能指望使用默认大小 */
+	font-size: 1em;
+	font-weight: normal;
+}
+p {
+	margin: 0 0 1em 0;
+}
+blockquote {
+	margin: 0 0 1em 0;
+}
+a {
+	color: #14647d;
+	text-decoration: none;
+	font-family: ~"tahoma,arial,\5b8b\4f53,sans-serif";
+	_font-family: arial, sans-serif;
+}
+a:hover {
+	text-decoration: underline;
+}
+img {
+	display: block;
+	border: 0;
+}
+li {
+	list-style: none;
+}
+ol { /* 这里有个小默契，对于列表，请设置l外层的ul或ol，而不是设置li */
+	padding: 0 0 0 2em;
+}
+/* 设置各表单元素的样式 */
+input, label, select, option, textarea, button, fieldset, legend {
+	/* 表单元素不继承body的字体属性，需重新定义 */
+	font-size: 1em;
+	font-family: ~"tahoma,arial,\5b8b\4f53,sans-serif";
+	_font-family: Arial, sans-serif;
+}
+
+input[type=text],textarea{-webkit-appearance:none;-webkit-border-radius:0;outline:none} /* for iOS */
+
+input.text{
+	color:#444;
+	border-color:#9f9f9f #dcdcdc #dcdcdc #9f9f9f;
+	border-style:solid;
+	border-width:1px;
+	padding:3px 2px;
+	height: 14px;
+}
+
+input.radio, input.checkbox {
+	margin-right: 2px;
+	vertical-align: -2px;
+}
+input.radio, input.checkbox { margin-left: -2px;}	/* hacked for IE 6 7*/
+label.radio, label.checkbox {
+	margin-right: 5px;
+}
+textarea {
+	border-color:#9f9f9f #dcdcdc #dcdcdc #9f9f9f;
+	border-style:solid;
+	border-width:1px;
+	padding:1px;
+	resize: none;
+}
+/* 工具箱 */
+.fix:after { /* 闭合容器 */
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+	.fix {display: inline-block; min-height: 1%;}
+	/* Hides from IE-mac \*/
+	*html .fix {zoom: 1;}
+	.fix {display: block;}
+	/* Hide from IE-mac ends */
+
+.clearleft{clear: left}
+
+.g_notify{background: #ffc; border-bottom: 1px solid #fc0; padding: 3px 8px; color: #808080; vertical-align: middle;}
+.g_notify label{position: absolute; right: 10px; top: 4px;}
+.g_notify label input{margin-right: 5px; vertical-align: middle;}
+.g_notify .btn{text-align: center; padding: 2px 5px; text-decoration: none; color: #404040; background: #fff; margin-left: 10px; border: 1px solid #d9d9d9; min-width: 20px; display: inline-block; -moz-border-radius: 4px; -webkit-border-radius: 4px;
+border-radius: 4px; background: -moz-linear-gradient(top, #fdfdfd, #f1f1f1); background: -webkit-gradient(linear, 0 0, 0 100%, from(#fdfdfd), to(#f1f1f1));}
+.g_notify .btn:active{background: #f1f1f1;}
+
+
+/* 布局 */
+.page_content,.frame_2cols {
+	clear: both;
+}
+	.page_content, .frame_2cols{ zoom: 1;}
+	.page_content:after, .frame_2cols:after{ content: ".";display: block;height: 0;clear: both;visibility: hidden;} /* wrappit */
+.main_col, .side_col{ _overflow: hidden; } /*防止在IE里撑开破掉*/
+
+/* Mask */
+.tui_mask {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color:#000;
+	filter:alpha(opacity=30);
+	opacity:0.3;
+}

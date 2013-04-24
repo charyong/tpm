@@ -1,0 +1,54 @@
+/* Global Nav 2012 Early */
+.g-top { min-width: 980px;height:146px; cursor: default; position: relative; z-index: 10001; }
+
+/*.g-bar { height: 26px; border-bottom: 1px solid #d2d2d2; background: url("@{imgPath}/g/ui/nav/v_v3.png") 0 -50px repeat-x; clear: both; position: relative; z-index: 10001; }
+.g-bar-main { width: 980px; margin: 0 auto; }
+.g-bar-link { float: left; width: 450px; padding: 6px 0 0 13px; }
+.g-bar-user { float: right; padding: 2px 4px 0; }*/
+
+.g_main{width: 100%; height: 93px; padding-top:13px; background:#f60 url("@{imgPath}/g/ui/nav/nav.png") 50% 0 no-repeat;}
+.g_main_c { width: 980px; height:93px; margin: 0 auto; clear: both; position: relative; *z-index: 10;}
+.g_main_c .logo { float: left; width: 180px; padding: 18px 0 0 4px; }
+.g_main_c .logo a { display: block; height: 45px; text-indent: -9999px; background: url("@{imgPath}/g/ui/nav/v2.png") 0 0 no-repeat; }
+
+.g_nav{position:absolute;top:106px; width: 100%; height: 40px; background:#333 url("@{imgPath}/g/ui/nav/v2.png") 0 -159px repeat-x;}
+.g_nav_main { width: 980px; margin: 0 auto; height: 35px; padding-top:5px;}
+.g_nav_main a { float: left;min-width: 30px; padding: 0 11px 0 12px; text-decoration: none; outline: none; }
+.g_nav_main li {position:relative; float: left; line-height: 31px;}
+.g_nav_main li.current a,
+.g_nav_main li.current a:hover {background:#fff; color: #181717;}
+
+.g-nav-master { float: left; width: 400px; height: 35px; overflow: hidden; }
+.g-nav-master li{ margin-right: 1px;}
+.g-nav-master a {height: 35px;  font-size: 14px; color: #fff; background: url("@{imgPath}/g/ui/nav/v2.png") 0 -87px no-repeat; font-weight: 700;}
+
+.g-nav-master a:not(first) { letter-spacing: 0.05em\9; }
+.g-nav-sub { float: right; height:35px; margin-right: -3px; padding: 0 3px 0 0; }
+.g-nav-sub a { min-width: 24px; height:35px; padding: 0 7px; color: #ccc; }
+.g_nav_main a:hover { text-decoration: none; background: url("@{imgPath}/g/ui/nav/v2.png") 0 -124px no-repeat; }
+
+.g-nav-new{position: absolute; right: 3px; top:-10px; display: inline-block; height: 15px; width: 16px;background: url("@{imgPath}/g/ui/nav/v2.png") -98px -90px no-repeat;}
+
+
+/* 频道等二级导航 */
+.g_subnav { width: 100%; height: 39px; margin: 0 auto 8px; background:#fff; overflow: hidden; }
+.g_subnav .gsn_i {width: 980px; height: 39px; margin:0 auto; }
+.g_subnav ul { width: 960px; height: 39px; margin: 0 10px; padding: 9px 0; overflow: hidden;line-height: 1; line-height: 1.25\9; *line-height: 1.25; }
+.g_subnav li { float: left; height: 20px; margin: 0 0 0 -10px; padding: 0 14px 0 5px; background: url("@{imgPath}/g/ui/nav/v2.png") -170px -431px no-repeat; white-space: nowrap; }
+.g_subnav li a { display: block; padding:4px 3px 4px 7px; color: #808080;}
+.g_subnav li a:hover{ text-decoration: none; color: #f60; }
+.g_subnav li.current a,
+.g_subnav .current a:hover,
+.g_subnav li a.current,
+.g_subnav li a.current:hover {background: #f60; color: #f0f0f0;}
+
+.g-extra {clear:both;width: 100%; height: 25px;}
+.g-extra .g-hotwords {position: absolute; bottom:0; left:0; }
+.g-extra .g-rank { position: absolute; right: 10px; bottom:0;}
+
+.g-top .g-upload { position: absolute; right: 0; top: 23px; width: 64px; height: 31px; background: url("@{imgPath}/g/ui/nav/v2.png") 0 -50px no-repeat; overflow: hidden; text-indent: -3000px; }
+.g-top .g-user .g-upload { display: none; }
+
+/* logo右侧图标链接 */
+#specialogo { position: absolute; top: 9px; left: 200px; }
+
