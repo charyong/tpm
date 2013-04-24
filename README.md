@@ -46,18 +46,18 @@ tpm src/img
 ```
 
 ### 指定配置
-用config参数指定配置，默认用当前目录下的`config.json`。
+用config参数指定配置，默认用当前目录下的`tpm-config.js`。
 
 ```bash
-tpm src/js/g.js --config=my-config.json
+tpm src/js/g.js --config=my-config.js
 ```
 
 ### 整理build、dist目录
 
-删除build、dist里的多余的目录和文件夹。
+删除build、dist里的多余的目录和文件。
 
 ```bash
-tpm clear
+tpm cleanup
 ```
 
 ### 配置说明
