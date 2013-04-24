@@ -177,6 +177,98 @@ function setSvnKeywords(path) {
 	});
 }
 
+// Escape mailto string
+// Reference: http://support.microsoft.com/kb/287573
+function escapeMailto(str) {
+	str = str.replace(/ /g, '%20');
+	str = str.replace(/,/g, '%2C');
+	str = str.replace(/\?/g, '%3F');
+	str = str.replace(/\./g, '%2E');
+	str = str.replace(/!/g, '%21');
+	str = str.replace(/:/g, '%3A');
+	str = str.replace(/;/g, '%3B');
+	str = str.replace(/&/g, '%26');
+	str = str.replace(/\r\n|\n/g, '%0D%0A');
+	return str;
+}
+
+// Open new mail window
+// Reference: http://support.microsoft.com/kb/287573
+function newMail(to, subject, body, callback) {
+	// mailto:<to email>?cc=<cc email>&bcc=<bcc mail>&subject=<subject text>&body=<body text>
+	var mailto = to + '?subject=' + escapeMailto(subject) + '&body=' + escapeMailto(body);
+
+	cmd = 'start mailto:"' + mailto + '"';
+
+	//grunt.log.write(cmd + '\n');
+
+	var mailProcess = ChildProcess.exec(cmd);
+
+	mailProcess.stdout.on('data', function(stdout) {
+		console.log('[MAILTO] ' + stdout);
+	});
+
+	mailProcess.stderr.on('data', function(stderr) {
+		error('[MAILTO] ' + stderr);
+	});
+
+	mailProcess.on('exit', function() {
+		callback && callback();
+	});
+}
+
+// Open new mail window and insert deploy info
+function deployByEmail(config, projectName, paths, callback) {
+	var pathCount = paths.length;
+
+	var contentList = [];
+
+	if (projectName !== '') {
+		contentList.push(config.jira_host + '/browse/' + projectName);
+		contentList.push('');
+	}
+
+	contentList.push('文件列表：');
+
+	var newPaths = [];
+	for (var i = 0, len = paths.length; i < len; i++) {
+		var path = paths[i];
+
+		var cmd = 'svn info "' + path.replace(/\\/g, '\\\\') + '"';
+
+		var cp = ChildProcess.exec(cmd);
+
+		cp.stdout.on('data', function(stdout) {
+			var data = Iconv.fromEncoding(stdout, 'gbk');
+			var match;
+			var line = '';
+			if ((match = /^URL:\s*(.+)$/im.exec(data))) {
+				line += match[1];
+			}
+			if ((match = /(?:Revision|版本):\s*(\d+)/i.exec(data))) {
+				line += ' ' + match[1];
+			}
+			contentList.push(line);
+		});
+
+		cp.stderr.on('data', function(stderr){
+			error('[SVN] ' + stderr);
+		});
+
+		cp.on('exit', function() {
+			pathCount--;
+			if (pathCount === 0) {
+				var subject = '版本发布' + (projectName !== '' ? (' - ' + projectName) : '');
+				var content = contentList.join('\r\n') + '\r\n';
+
+				console.log(content);
+
+				newMail(config.deploy_mail, subject, content, callback);
+			}
+		});
+	}
+}
+
 exports.linefeed = linefeed;
 exports.banner = banner;
 exports.each = each;
@@ -193,3 +285,5 @@ exports.minJs = minJs;
 exports.minCss = minCss;
 exports.concatFile = concatFile;
 exports.setSvnKeywords = setSvnKeywords;
+exports.newMail = newMail;
+exports.deployByEmail = deployByEmail;

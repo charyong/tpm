@@ -57,14 +57,9 @@ exports.run = function(args, config) {
 		}
 	}
 
-	// 初始化
-	function init() {
-		var buildPath = Path.resolve(config.root + '/build');
-		var distPath = Path.resolve(config.root + '/dist');
+	var buildPath = Path.resolve(config.root + '/build');
+	var distPath = Path.resolve(config.root + '/dist');
 
-		cleanup(buildPath);
-		cleanup(distPath);
-	}
-
-	init();
+	cleanup(buildPath);
+	cleanup(distPath);
 };

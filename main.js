@@ -50,7 +50,7 @@ if (ARGV._.length > 0 && TASK_MAP[ARGV._[0]]) {
 
 var config = null;
 
-var dirPath = args.length > 0 ? args[0] : '.';
+var dirPath = (cmd != 'diff' && args.length > 0) ? args[0] : '.';
 
 if (!Fs.existsSync(dirPath)) {
 	Util.error('File not found: ' + dirPath);
