@@ -24,18 +24,19 @@ tpm [command]
 ### 目录结构
 
 ```
-src/
+src/		# 源代码
 	js/
 	css/
 	img/
-build/
+build/		# 打包后代码，未压缩
 	js/
 	css/
 	img/
-dist/
+dist/		# 压缩后代码
 	js/
 	css/
 	img/
+project/	# 项目文件，用于批量操作
 ```
 
 ### 构建JS
@@ -60,6 +61,12 @@ tpm src/css
 tpm src/img/demo.png
 tpm src/embed/storage.html
 tpm src/img
+```
+
+### 批量构建
+
+```bash
+tpm project/TUILIB-65.txt
 ```
 
 ### 指定配置
