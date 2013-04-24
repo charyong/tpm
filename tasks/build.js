@@ -29,6 +29,10 @@ exports.run = function(args, config) {
 
 	// 是否可构建的文件
 	function canBuild(path) {
+		if (!Util.indir(path, Path.resolve(config.root + '/src'))) {
+			return false;
+		}
+
 		if (/\.js$/.test(path)) {
 			var relativePath = getRelativePath(path, 'js');
 			return config.main.js.indexOf(relativePath) >= 0;
@@ -104,12 +108,18 @@ exports.run = function(args, config) {
 			}
 			Util.writeFileSync(buildPath, Util.banner + tree.toCSS());
 			Util.minCss(buildPath, distPath);
+			Util.setSvnKeywords(buildPath);
+			Util.setSvnKeywords(distPath);
 		});
 	}
 
 	// 构建一个图片文件
 	function buildImg(path) {
+		var buildPath = getBuildPath(path);
+		var distPath = getDistPath(path);
 
+		Util.copyFile(path, buildPath);
+		Util.copyFile(path, distPath);
 	}
 
 	// 返回一个目录里所有要构建的文件

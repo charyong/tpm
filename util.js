@@ -44,6 +44,26 @@ function error(str) {
 	console.error('\033[31m', str, '\033[0m');
 }
 
+function indir(path, dirPath) {
+	while (true) {
+		if (!Fs.existsSync(path)) {
+			return false;
+		}
+
+		if (path == dirPath) {
+			return true;
+		}
+
+		var parentPath = Path.dirname(path);
+
+		if (parentPath == path) {
+			return false;
+		}
+
+		path = parentPath;
+	}
+}
+
 function mkdir(dirPath, mode) {
 	var list = [];
 	while (true) {
@@ -164,6 +184,7 @@ exports.undef = undef;
 exports.info = info;
 exports.warn = warn;
 exports.error = error;
+exports.indir = indir;
 exports.mkdir = mkdir;
 exports.readFileSync = readFileSync;
 exports.writeFileSync = writeFileSync;
