@@ -21,6 +21,23 @@ TPM是前端打包工具。
 tpm [command]
 ```
 
+### 目录结构
+
+```
+src/
+	js/
+	css/
+	img/
+build/
+	js/
+	css/
+	img/
+dist/
+	js/
+	css/
+	img/
+```
+
 ### 构建JS
 
 ```bash
