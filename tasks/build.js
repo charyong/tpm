@@ -29,7 +29,7 @@ exports.run = function(args, config) {
 
 	// 是否可构建的文件
 	function canBuild(path) {
-		if (!Util.indir(path, Path.resolve(config.root + '/src'))) {
+		if (!Util.indir(path, Path.resolve(config.root + '/src')) && !Util.indir(path, Path.resolve(config.root + '/project'))) {
 			return false;
 		}
 
@@ -43,7 +43,7 @@ exports.run = function(args, config) {
 			return config.main.css.indexOf(relativePath) >= 0;
 		}
 
-		return /\.(jpg|png|gif|ico|swf|htm|html)$/.test(path);
+		return /\.(jpg|png|gif|ico|swf|htm|html|txt)$/.test(path);
 	}
 
 	// 构建一个JS文件
@@ -122,6 +122,51 @@ exports.run = function(args, config) {
 		Util.copyFile(path, distPath);
 	}
 
+	// 根据一个项目
+	function buildProject(path) {
+		var content = Fs.readFileSync(path, 'utf-8');
+
+		var paths = content.replace(/^\s+|\s+$/g, '').split(/\r\n|\n/);
+
+		var pathList = [];
+		for (var i = 0, len = paths.length; i < len; i++) {
+			var path = paths[i].replace(/^\s+|\s+$/g, '');
+
+			if (path == '' || path.charAt(0) == '#') {
+				continue;
+			}
+
+			path = path.replace(/^(src|build|dist)\//, '');
+			path = path.replace(/\.css$/, '.less');
+
+			path = Path.resolve(config.root + '/src/' + path);
+
+			if (Fs.existsSync(path)) {
+				pathList.push(path);
+			}
+		}
+
+		buildFiles(pathList);
+	}
+
+	// 构建多个文件
+	function buildFiles(pathList) {
+		pathList.forEach(function(path) {
+			if (/\.js$/.test(path)) {
+				buildJs(path);
+			} else if (/\.less$/.test(path)) {
+				buildLess(path);
+			} else {
+				var projectPath = Path.resolve(config.root + '/project');
+				if (Util.indir(path, projectPath)) {
+					buildProject(path);
+				} else {
+					buildImg(path);
+				}
+			}
+		});
+	}
+
 	// 返回一个目录里所有要构建的文件
 	function grepPaths(rootDirPath) {
 		var paths = [];
@@ -174,15 +219,7 @@ exports.run = function(args, config) {
 			}
 		}
 
-		pathList.forEach(function(path) {
-			if (/\.js$/.test(path)) {
-				buildJs(path);
-			} else if (/\.less$/.test(path)) {
-				buildLess(path);
-			} else {
-				buildImg(path);
-			}
-		});
+		buildFiles(pathList);
 	}
 
 	init();

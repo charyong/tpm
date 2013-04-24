@@ -115,9 +115,9 @@ function writeFileSync(filePath, content) {
 function copyFile(fromPath, toPath) {
 	console.log('Copy file: ' + fromPath);
 
-	var content = readFileSync(fromPath, 'utf-8');
+	var buffer = readFileSync(fromPath);
 
-	writeFileSync(toPath, content);
+	writeFileSync(toPath, buffer);
 
 	info('File "' + toPath + '" created.' + linefeed);
 }
@@ -160,7 +160,7 @@ function concatFile(fromPaths, toPath) {
 		contentList.push(readFileSync(path, 'utf-8'));
 	});
 
-	writeFileSync(toPath, banner + contentList.join(linefeed));
+	writeFileSync(toPath, contentList.join(linefeed));
 
 	info('File "' + toPath + '" created.' + linefeed);
 }
