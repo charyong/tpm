@@ -1,11 +1,11 @@
 {
 	"name": "tpm",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Static Package Manager",
 	"author": "Longhao Luo <lhluo@tudou.com>",
 	"license": "GPL",
 	"bin" : {
-		"tpm": "./tpm"
+		"ytpm": "./ytpm"
 	},
 	"repository": {
 		"type": "git",
