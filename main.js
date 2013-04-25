@@ -9,17 +9,17 @@ var TASK_MAP = {
 	build : true,
 	min : true,
 	deploy : true,
-	diff : true,
+	list : true,
 	cleanup : true,
 };
 
 Optimist.usage([
-	'Usage: tpm [command] --config=[/path/to/config-file]\n\n',
+	'Usage: tpm [COMMAND] --config=[CONFIG_FILE]\n\n',
 	'Examples:\n',
 	'tpm src/js/g.js\n',
 	'tpm src/css/g.less\n',
 	'tpm min build/js/g.js\n',
-	'tpm diff 100\n',
+	'tpm list 100\n',
 	'tpm deploy src/js/page/play wwwtest\n',
 	'tpm cleanup\n',
 ].join(''));
@@ -50,11 +50,10 @@ if (ARGV._.length > 0 && TASK_MAP[ARGV._[0]]) {
 
 var config = null;
 
-var dirPath = (cmd != 'diff' && args.length > 0) ? args[0] : '.';
+var dirPath = args.length > 0 ? args[0] : '.';
 
 if (!Fs.existsSync(dirPath)) {
-	Util.error('File not found: ' + dirPath);
-	process.exit();
+	dirPath = '.';
 }
 
 var dirStat = Fs.statSync(dirPath);

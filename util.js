@@ -28,6 +28,11 @@ function each(obj, fn) {
 	}
 }
 
+function trim(str) {
+	// Forgive various special whitespaces, e.g. &nbsp;(\xa0).
+	return str.replace(/(?:^[ \t\n\r]+)|(?:[ \t\n\r]+$)/g, '');
+}
+
 function undef(val, defaultVal) {
 	return typeof val === 'undefined' ? defaultVal : val;
 }
@@ -45,23 +50,10 @@ function error(str) {
 }
 
 function indir(path, dirPath) {
-	while (true) {
-		if (!Fs.existsSync(path)) {
-			return false;
-		}
+	path = Path.resolve(path);
+	dirPath = Path.resolve(dirPath);
 
-		if (path == dirPath) {
-			return true;
-		}
-
-		var parentPath = Path.dirname(path);
-
-		if (parentPath == path) {
-			return false;
-		}
-
-		path = parentPath;
-	}
+	return path.indexOf(dirPath) == 0;
 }
 
 function mkdir(dirPath, mode) {
@@ -177,6 +169,33 @@ function setSvnKeywords(path) {
 	});
 }
 
+function readProjectFile(config, path) {
+	var content = Fs.readFileSync(path, 'utf-8');
+
+	var paths = trim(content).split(/\r\n|\n/);
+
+	var pathList = [];
+
+	for (var i = 0, len = paths.length; i < len; i++) {
+		var path = trim(paths[i]);
+
+		if (path == '' || path.charAt(0) == '#') {
+			continue;
+		}
+
+		path = path.replace(/^(src|build|dist)\//, '');
+		path = path.replace(/\.css$/, '.less');
+
+		path = Path.resolve(config.root + '/src/' + path);
+
+		if (Fs.existsSync(path)) {
+			pathList.push(path);
+		}
+	}
+
+	return pathList;
+}
+
 // Escape mailto string
 // Reference: http://support.microsoft.com/kb/287573
 function escapeMailto(str) {
@@ -272,6 +291,7 @@ function deployByEmail(config, projectName, paths, callback) {
 exports.linefeed = linefeed;
 exports.banner = banner;
 exports.each = each;
+exports.trim = trim;
 exports.undef = undef;
 exports.info = info;
 exports.warn = warn;
@@ -285,5 +305,6 @@ exports.minJs = minJs;
 exports.minCss = minCss;
 exports.concatFile = concatFile;
 exports.setSvnKeywords = setSvnKeywords;
+exports.readProjectFile = readProjectFile;
 exports.newMail = newMail;
 exports.deployByEmail = deployByEmail;

@@ -77,7 +77,11 @@ exports.run = function(args, config) {
 			var stat = Fs.statSync(path);
 			if (stat.isDirectory(path)) {
 				pathList = grepPaths(path);
-			} else if (canBuild(path)) {
+			} else {
+				if (!canBuild(path)) {
+					Util.error('Cannot compress: ' + path);
+					return;
+				}
 				pathList.push(path);
 			}
 		}

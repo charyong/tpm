@@ -124,27 +124,7 @@ exports.run = function(args, config) {
 
 	// 根据一个项目
 	function buildProject(path) {
-		var content = Fs.readFileSync(path, 'utf-8');
-
-		var paths = content.replace(/^\s+|\s+$/g, '').split(/\r\n|\n/);
-
-		var pathList = [];
-		for (var i = 0, len = paths.length; i < len; i++) {
-			var path = paths[i].replace(/^\s+|\s+$/g, '');
-
-			if (path == '' || path.charAt(0) == '#') {
-				continue;
-			}
-
-			path = path.replace(/^(src|build|dist)\//, '');
-			path = path.replace(/\.css$/, '.less');
-
-			path = Path.resolve(config.root + '/src/' + path);
-
-			if (Fs.existsSync(path)) {
-				pathList.push(path);
-			}
-		}
+		var pathList = Util.readProjectFile(config, path);
 
 		buildFiles(pathList);
 	}
@@ -214,7 +194,11 @@ exports.run = function(args, config) {
 			var stat = Fs.statSync(path);
 			if (stat.isDirectory(path)) {
 				pathList = grepPaths(path);
-			} else if (canBuild(path)) {
+			} else {
+				if (!canBuild(path)) {
+					Util.error('Cannot build: ' + path);
+					return;
+				}
 				pathList.push(path);
 			}
 		}
