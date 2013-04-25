@@ -169,7 +169,8 @@ function setSvnKeywords(path) {
 	});
 }
 
-function readProjectFile(config, path) {
+// @param type: "src", "build", "dist"
+function readProjectFile(config, path, type) {
 	var content = Fs.readFileSync(path, 'utf-8');
 
 	var paths = trim(content).split(/\r\n|\n/);
@@ -184,13 +185,21 @@ function readProjectFile(config, path) {
 		}
 
 		path = path.replace(/^(src|build|dist)\//, '');
-		path = path.replace(/\.css$/, '.less');
 
-		path = Path.resolve(config.root + '/src/' + path);
-
-		if (Fs.existsSync(path)) {
-			pathList.push(path);
+		if (type == 'src') {
+			path = path.replace(/\.css$/, '.less');
+		} else {
+			path = path.replace(/\.less$/, '.css');
 		}
+
+		path = Path.resolve(config.root + '/' + type + '/' + path);
+
+		if (!Fs.existsSync(path)) {
+			error('File not found: ' + path);
+			continue;
+		}
+
+		pathList.push(path);
 	}
 
 	return pathList;
@@ -236,58 +245,6 @@ function newMail(to, subject, body, callback) {
 	});
 }
 
-// Open new mail window and insert deploy info
-function deployByEmail(config, projectName, paths, callback) {
-	var pathCount = paths.length;
-
-	var contentList = [];
-
-	if (projectName !== '') {
-		contentList.push(config.jira_host + '/browse/' + projectName);
-		contentList.push('');
-	}
-
-	contentList.push('文件列表：');
-
-	var newPaths = [];
-	for (var i = 0, len = paths.length; i < len; i++) {
-		var path = paths[i];
-
-		var cmd = 'svn info "' + path.replace(/\\/g, '\\\\') + '"';
-
-		var cp = ChildProcess.exec(cmd);
-
-		cp.stdout.on('data', function(stdout) {
-			var data = Iconv.fromEncoding(stdout, 'gbk');
-			var match;
-			var line = '';
-			if ((match = /^URL:\s*(.+)$/im.exec(data))) {
-				line += match[1];
-			}
-			if ((match = /(?:Revision|版本):\s*(\d+)/i.exec(data))) {
-				line += ' ' + match[1];
-			}
-			contentList.push(line);
-		});
-
-		cp.stderr.on('data', function(stderr){
-			error('[SVN] ' + stderr);
-		});
-
-		cp.on('exit', function() {
-			pathCount--;
-			if (pathCount === 0) {
-				var subject = '版本发布' + (projectName !== '' ? (' - ' + projectName) : '');
-				var content = contentList.join('\r\n') + '\r\n';
-
-				console.log(content);
-
-				newMail(config.deploy_mail, subject, content, callback);
-			}
-		});
-	}
-}
-
 exports.linefeed = linefeed;
 exports.banner = banner;
 exports.each = each;
@@ -307,4 +264,3 @@ exports.concatFile = concatFile;
 exports.setSvnKeywords = setSvnKeywords;
 exports.readProjectFile = readProjectFile;
 exports.newMail = newMail;
-exports.deployByEmail = deployByEmail;

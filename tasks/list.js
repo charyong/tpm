@@ -11,6 +11,58 @@ var DIFF_USAGE = 'Usage: tpm list [REVISION]\n\n' +
 	'Examples:\n' +
 	'tpm list 28464\n';
 
+// Open new mail window and insert file list
+function openEmail(config, projectName, paths, callback) {
+	var pathCount = paths.length;
+
+	var contentList = [];
+
+	if (projectName !== '') {
+		contentList.push(config.jira_host + '/browse/' + projectName);
+		contentList.push('');
+	}
+
+	contentList.push('文件列表：');
+
+	var newPaths = [];
+	for (var i = 0, len = paths.length; i < len; i++) {
+		var path = paths[i];
+
+		var cmd = 'svn info "' + path.replace(/\\/g, '\\\\') + '"';
+
+		var cp = ChildProcess.exec(cmd);
+
+		cp.stdout.on('data', function(stdout) {
+			var data = Iconv.fromEncoding(stdout, 'gbk');
+			var match;
+			var line = '';
+			if ((match = /^URL:\s*(.+)$/im.exec(data))) {
+				line += match[1];
+			}
+			if ((match = /(?:Revision|版本):\s*(\d+)/i.exec(data))) {
+				line += ' ' + match[1];
+			}
+			contentList.push(line);
+		});
+
+		cp.stderr.on('data', function(stderr){
+			error('[SVN] ' + stderr);
+		});
+
+		cp.on('exit', function() {
+			pathCount--;
+			if (pathCount === 0) {
+				var subject = '版本发布' + (projectName !== '' ? (' - ' + projectName) : '');
+				var content = contentList.join('\r\n') + '\r\n';
+
+				console.log(content);
+
+				Util.newMail(config.deploy_mail, subject, content, callback);
+			}
+		});
+	}
+}
+
 exports.run = function(args, config) {
 
 	var distDirPath = Path.resolve(config.root + '/dist');
@@ -55,7 +107,7 @@ exports.run = function(args, config) {
 				}
 			});
 
-			Util.deployByEmail(config, '', pathList);
+			openEmail(config, '', pathList);
 		});
 		return;
 	}
@@ -63,9 +115,9 @@ exports.run = function(args, config) {
 	// 根据项目文件输出列表
 	var path = args[0];
 
-	var pathList = Util.readProjectFile(config, path);
+	var pathList = Util.readProjectFile(config, path, 'dist');
 
 	var basename = Path.basename(path, '.txt');
 
-	Util.deployByEmail(config, basename, pathList);
+	openEmail(config, basename, pathList);
 };

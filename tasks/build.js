@@ -124,7 +124,7 @@ exports.run = function(args, config) {
 
 	// 根据一个项目
 	function buildProject(path) {
-		var pathList = Util.readProjectFile(config, path);
+		var pathList = Util.readProjectFile(config, path, 'src');
 
 		buildFiles(pathList);
 	}
