@@ -100,9 +100,9 @@ exports.run = function(args, config) {
 			var lines = content.split(/\r\n|\n/);
 
 			lines.forEach(function(line) {
-				line = Util.trim(line);
+				//line = Util.trim(line);
 				var match;
-				if ((match = /^[MA]\s+(.*)$/.exec(line))) {
+				if ((match = /^[MA]M?\s+(.*)$/.exec(line))) {
 					pathList.push(match[1]);
 				}
 			});
