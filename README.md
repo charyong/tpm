@@ -18,7 +18,7 @@ TPM是前端打包工具。
 ## 使用方法
 
 ```bash
-tpm [command]
+ytpm [command]
 ```
 
 ### 目录结构
@@ -42,38 +42,38 @@ project/	# 项目文件，用于批量操作
 ### 构建JS
 
 ```bash
-tpm src/js/g.js
-tpm src/js/page/demo.js
-tpm src/js
+ytpm src/js/g.js
+ytpm src/js/page/demo.js
+ytpm src/js
 ```
 
 ### 构建LESS
 
 ```bash
-tpm src/css/g.less
-tpm src/css/page/demo.less
-tpm src/css
+ytpm src/css/g.less
+ytpm src/css/page/demo.less
+ytpm src/css
 ```
 
 ### 构建图片、embed
 
 ```bash
-tpm src/img/demo.png
-tpm src/embed/storage.html
-tpm src/img
+ytpm src/img/demo.png
+ytpm src/embed/storage.html
+ytpm src/img
 ```
 
 ### 批量构建
 
 ```bash
-tpm project/TUILIB-65.txt
+ytpm project/TUILIB-65.txt
 ```
 
 ### 指定配置
 用config参数指定配置，默认用当前目录下的`tpm-config.js`。
 
 ```bash
-tpm src/js/g.js --config=my-config.js
+ytpm src/js/g.js --config=my-config.js
 ```
 
 ### 整理build、dist目录
@@ -81,7 +81,7 @@ tpm src/js/g.js --config=my-config.js
 删除build、dist里的多余的目录和文件。
 
 ```bash
-tpm cleanup
+ytpm cleanup
 ```
 
 ### 配置说明
