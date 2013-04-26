@@ -147,37 +147,6 @@ exports.run = function(args, config) {
 		});
 	}
 
-	// 返回一个目录里所有要构建的文件
-	function grepPaths(rootDirPath) {
-		var paths = [];
-
-		function walk(dirPath) {
-			var files = Fs.readdirSync(dirPath);
-
-			for (var i = 0, len = files.length; i < len; i++) {
-				var file = files[i];
-
-				if (file.charAt(0) === '.') {
-					continue;
-				}
-
-				var path = Path.resolve(dirPath + '/' + file);
-
-				var stat = Fs.statSync(path);
-
-				if (stat.isDirectory()) {
-					walk(path);
-				} else if (canBuild(path)) {
-					paths.push(path);
-				}
-			}
-		}
-
-		walk(rootDirPath);
-
-		return paths;
-	}
-
 	// 初始化
 	function init() {
 		var pathList = [];
@@ -193,7 +162,7 @@ exports.run = function(args, config) {
 			var path = Path.resolve(args[0]);
 			var stat = Fs.statSync(path);
 			if (stat.isDirectory(path)) {
-				pathList = grepPaths(path);
+				pathList = Util.grepPaths(path, canBuild);
 			} else {
 				if (!canBuild(path)) {
 					Util.error('Cannot build: ' + path);

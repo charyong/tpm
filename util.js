@@ -245,6 +245,36 @@ function newMail(to, subject, body, callback) {
 	});
 }
 
+function grepPaths(rootDirPath, checkFn) {
+	var paths = [];
+
+	function walk(dirPath) {
+		var files = Fs.readdirSync(dirPath);
+
+		for (var i = 0, len = files.length; i < len; i++) {
+			var file = files[i];
+
+			if (file.charAt(0) === '.') {
+				continue;
+			}
+
+			var path = Path.resolve(dirPath + '/' + file);
+
+			var stat = Fs.statSync(path);
+
+			if (stat.isDirectory()) {
+				walk(path);
+			} else if (checkFn(path)) {
+				paths.push(path);
+			}
+		}
+	}
+
+	walk(rootDirPath);
+
+	return paths;
+}
+
 exports.linefeed = linefeed;
 exports.banner = banner;
 exports.each = each;
@@ -264,3 +294,4 @@ exports.concatFile = concatFile;
 exports.setSvnKeywords = setSvnKeywords;
 exports.readProjectFile = readProjectFile;
 exports.newMail = newMail;
+exports.grepPaths = grepPaths;
