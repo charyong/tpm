@@ -107,6 +107,46 @@ exports.run = function(args, config) {
 
 	var distDirPath = Path.resolve(config.root + '/dist');
 
+	// 是否可发布的文件
+	function canDeploy(path) {
+		if (!Util.indir(path, Path.resolve(config.root + '/dist'))) {
+			return false;
+		}
+
+		return /\.(js|css|jpg|png|gif|ico|swf|htm|html)$/.test(path);
+	}
+
+	// 返回一个目录里所有要构建的文件
+	function grepPaths(rootDirPath) {
+		var paths = [];
+
+		function walk(dirPath) {
+			var files = Fs.readdirSync(dirPath);
+
+			for (var i = 0, len = files.length; i < len; i++) {
+				var file = files[i];
+
+				if (file.charAt(0) === '.') {
+					continue;
+				}
+
+				var path = Path.resolve(dirPath + '/' + file);
+
+				var stat = Fs.statSync(path);
+
+				if (stat.isDirectory()) {
+					walk(path);
+				} else if (canDeploy(path)) {
+					paths.push(path);
+				}
+			}
+		}
+
+		walk(rootDirPath);
+
+		return paths;
+	}
+
 	if (args.length < 2) {
 		console.log(DEPLOY_USAGE);
 		return;
@@ -115,18 +155,23 @@ exports.run = function(args, config) {
 	var path = args[0];
 	var env = args[1];
 
+	path = Path.resolve(path);
+
 	var pathList = [];
 
 	if (Util.indir(path, config.root + '/project')) {
 		pathList = Util.readProjectFile(config, path, 'dist');
 	} else {
 		var stat = Fs.statSync(path);
-		if (!Util.indir(path, config.root + '/dist') || stat.isDirectory(path)) {
-			Util.error('Cannot deploy: ' + path);
-			return;
+		if (stat.isDirectory(path)) {
+			pathList = grepPaths(path);
+		} else {
+			if (!canDeploy(path)) {
+				Util.error('Cannot deploy: ' + path);
+				return;
+			}
+			pathList.push(path);
 		}
-		path = Path.resolve(path);
-		pathList.push(path);
 	}
 
 	if (env == 'beta') {
