@@ -114,10 +114,12 @@ function copyFile(fromPath, toPath) {
 	info('File "' + toPath + '" created.' + linefeed);
 }
 
-function minJs(fromPath, toPath) {
+function minJs(fromPath, toPath, charset) {
+	charset = charset || 'utf-8';
+
 	console.log('Compress file: ' + fromPath);
 
-	var content = readFileSync(fromPath, 'utf-8');
+	var content = readFileSync(fromPath, charset);
 
 	var ast = uglifyParser.parse(content); // parse code and get the initial AST
 	ast = uglifyPro.ast_mangle(ast);
@@ -129,10 +131,12 @@ function minJs(fromPath, toPath) {
 	info('File "' + toPath + '" created.' + linefeed);
 }
 
-function minCss(fromPath, toPath) {
+function minCss(fromPath, toPath, charset) {
+	charset = charset || 'utf-8';
+
 	console.log('Compress file: ' + fromPath);
 
-	var content = readFileSync(fromPath, 'utf-8');
+	var content = readFileSync(fromPath, charset);
 
 	var minContent = CleanCss.process(content);
 
@@ -141,7 +145,9 @@ function minCss(fromPath, toPath) {
 	info('File "' + toPath + '" created.' + linefeed);
 }
 
-function concatFile(fromPaths, toPath) {
+function concatFile(fromPaths, toPath, charset) {
+	charset = charset || 'utf-8';
+
 	console.log('Concat files:');
 
 	var contentList = [];
@@ -149,7 +155,7 @@ function concatFile(fromPaths, toPath) {
 	fromPaths.forEach(function(path) {
 		console.log(path);
 
-		contentList.push(readFileSync(path, 'utf-8'));
+		contentList.push(readFileSync(path, charset));
 	});
 
 	writeFileSync(toPath, contentList.join(linefeed));
