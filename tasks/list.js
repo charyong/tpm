@@ -28,7 +28,7 @@ function openEmail(config, projectName, paths, callback) {
 	for (var i = 0, len = paths.length; i < len; i++) {
 		var path = paths[i];
 
-		var cmd = 'svn info "' + path.replace(/\\/g, '\\\\') + '"';
+		var cmd = (process.platform === 'win32' ? 'set' : 'export') + ' LANG=en_US && svn info "' + path.replace(/\\/g, '\\\\') + '"';
 
 		var cp = ChildProcess.exec(cmd);
 
@@ -39,7 +39,7 @@ function openEmail(config, projectName, paths, callback) {
 			if ((match = /^URL:\s*(.+)$/im.exec(data))) {
 				line += match[1];
 			}
-			if ((match = /(?:Revision|版本):\s*(\d+)/i.exec(data))) {
+			if ((match = /^Last Changed Rev:\s*(\d+)$/im.exec(data))) {
 				line += ' ' + match[1];
 			}
 			contentList.push(line);

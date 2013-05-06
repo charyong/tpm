@@ -1,9 +1,11 @@
 
 var Path = require('path');
 var Fs = require('fs');
+var Iconv = require('iconv-lite');
 var _ = require('underscore');
 var Ozma = require('ozma-tudou').Ozma;
 var Less = require('less');
+var ChildProcess = require('child_process');
 
 var Util = require(__dirname + '/../util');
 
@@ -44,6 +46,99 @@ exports.run = function(args, config) {
 		}
 
 		return /\.(jpg|png|gif|ico|swf|htm|html|txt)$/.test(path);
+	}
+
+	// 取得文件SVN版本号
+	function getSvnVersion(pathList, callback) {
+		var pathCount = pathList.length;
+
+		var result = {};
+
+		for (var i = 0, len = pathList.length; i < len; i++) {
+			var path = pathList[i];
+
+			if (!Fs.existsSync(path)) {
+				Util.error('File not found: ' + path);
+				continue;
+			}
+
+			var cmd = (process.platform === 'win32' ? 'set' : 'export') + ' LANG=en_US && svn info "' + path.replace(/\\/g, '\\\\') + '"';
+
+			var cp = ChildProcess.exec(cmd);
+
+			cp.stdout.on('data', function(stdout) {
+				var data = Iconv.fromEncoding(stdout, 'gbk');
+				console.log(data)
+				var match;
+				if ((match = /^Path:\s*(.+)$/im.exec(data))) {
+					var key = match[1];
+				}
+				if ((match = /^Last Changed Rev:\s*(\d+)$/im.exec(data))) {
+					var value = match[1];
+				}
+				if (key && value) {
+					key = key.substr(0, 1).toLowerCase() + key.substr(1);
+					result[key] = value;
+				}
+			});
+
+			cp.stderr.on('data', function(stderr){
+				Util.error('[SVN] ' + stderr);
+			});
+
+			cp.on('exit', function() {
+				pathCount--;
+				if (pathCount === 0) {
+					callback(result);
+				}
+			});
+		}
+	}
+
+	// 图片版本化
+	function renameAssets(cssPath, content, callback) {
+		var dirPath = Path.dirname(cssPath);
+
+		function url2path(url) {
+			var path = null;
+			if (url.charAt(0) == '.') {
+				path = Path.resolve(dirPath + '/' + url);
+			} else if (url.charAt(0) == '/') {
+				path = Path.resolve(config.root + '/../' + url);
+			}
+			return path;
+		}
+
+		var match;
+		var regExp = /url\("((?:\\"|[^"])+)"\)/g;
+		var newContent = content.replace(/\/\*[\S\s]*?\*\//g, '');
+		var pathList = [];
+		while((match = regExp.exec(newContent))) {
+			var url = match[1];
+			var path = url2path(url);
+			if (path) {
+				pathList.push(path);
+			}
+		}
+
+		getSvnVersion(pathList, function(data) {
+			content = content.replace(/\/\*[\S\s]*?\*\/|(url\(")((?:\\"|[^"])+)("\))/g, function(full, prefix, url, suffix) {
+				if (prefix) {
+					var path = url2path(url);
+					if (data[path]) {
+						var version = data[path];
+						var buildPath = getBuildPath(path);
+						var distPath = getDistPath(path);
+						console.log(path, version)
+						console.log(buildPath)
+						console.log(distPath)
+						return prefix + url + suffix;
+					}
+				}
+				return full;
+			});
+			callback(content);
+		});
 	}
 
 	// 构建一个JS文件
@@ -106,10 +201,13 @@ exports.run = function(args, config) {
 			if (err) {
 				return Util.error(err);
 			}
-			Util.writeFileSync(buildPath, Util.banner + tree.toCSS());
-			Util.minCss(buildPath, distPath);
-			Util.setSvnKeywords(buildPath);
-			Util.setSvnKeywords(distPath);
+			content = tree.toCSS();
+			renameAssets(path, content, function(content) {
+				Util.writeFileSync(buildPath, Util.banner + content);
+				Util.minCss(buildPath, distPath);
+				Util.setSvnKeywords(buildPath);
+				Util.setSvnKeywords(distPath);
+			});
 		});
 	}
 
