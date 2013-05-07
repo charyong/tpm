@@ -43,10 +43,10 @@ exports.run = function(args, config) {
 
 			var srcPath = Path.resolve(config.root + '/src/' + relativePath.replace(/\.css$/, '.less'));
 
-			if (!Fs.existsSync(srcPath)) {
+			if (!Fs.existsSync(srcPath) && !Fs.existsSync(srcPath.replace(/_\d+(\.\w+)$/, '$1'))) {
 				Rimraf.sync(path);
 				Util.info('File "' + path + '" deleted.' + Util.linefeed);
-				return;
+				continue;
 			}
 
 			var stat = Fs.statSync(path);

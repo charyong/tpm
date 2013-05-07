@@ -57,6 +57,10 @@ exports.run = function(args, config) {
 		for (var i = 0, len = pathList.length; i < len; i++) {
 			var path = pathList[i];
 
+			if (result[path]) {
+				continue;
+			}
+
 			if (!Fs.existsSync(path)) {
 				Util.error('File not found: ' + path);
 				continue;
@@ -68,7 +72,6 @@ exports.run = function(args, config) {
 
 			cp.stdout.on('data', function(stdout) {
 				var data = Iconv.fromEncoding(stdout, 'gbk');
-				console.log(data)
 				var match;
 				if ((match = /^Path:\s*(.+)$/im.exec(data))) {
 					var key = match[1];
@@ -109,6 +112,10 @@ exports.run = function(args, config) {
 			return path;
 		}
 
+		function addVersion(path, version) {
+			return path.replace(/^(.+)(\.\w+)$/, '$1_' + version + '$2');
+		}
+
 		var match;
 		var regExp = /url\("((?:\\"|[^"])+)"\)/g;
 		var newContent = content.replace(/\/\*[\S\s]*?\*\//g, '');
@@ -127,12 +134,13 @@ exports.run = function(args, config) {
 					var path = url2path(url);
 					if (data[path]) {
 						var version = data[path];
-						var buildPath = getBuildPath(path);
-						var distPath = getDistPath(path);
-						console.log(path, version)
-						console.log(buildPath)
-						console.log(distPath)
-						return prefix + url + suffix;
+						var buildPath = addVersion(getBuildPath(path), version);
+						var distPath = addVersion(getDistPath(path), version);
+
+						Util.copyFile(path, buildPath);
+						Util.copyFile(path, distPath);
+
+						return prefix + addVersion(url, version) + suffix;
 					}
 				}
 				return full;
