@@ -103,7 +103,7 @@ exports.run = function(args, config) {
 		var dirPath = Path.dirname(cssPath);
 
 		function url2path(url) {
-			var path = null;
+			var path = '';
 			if (url.charAt(0) == '.') {
 				path = Path.resolve(dirPath + '/' + url);
 			} else if (url.charAt(0) == '/') {
@@ -132,6 +132,7 @@ exports.run = function(args, config) {
 			content = content.replace(/\/\*[\S\s]*?\*\/|(url\(")((?:\\"|[^"])+)("\))/g, function(full, prefix, url, suffix) {
 				if (prefix) {
 					var path = url2path(url);
+					path = path.substr(0, 1).toLowerCase() + path.substr(1);
 					if (data[path]) {
 						var version = data[path];
 						var buildPath = addVersion(getBuildPath(path), version);
