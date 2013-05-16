@@ -24,10 +24,7 @@ function openEmail(config, projectName, paths, callback) {
 
 	contentList.push('文件列表：');
 
-	var newPaths = [];
-	for (var i = 0, len = paths.length; i < len; i++) {
-		var path = paths[i];
-
+	paths.forEach(function(path) {
 		var cmd = (process.platform === 'win32' ? 'set' : 'export') + ' LANG=en_US && svn info "' + path.replace(/\\/g, '\\\\') + '"';
 
 		var cp = ChildProcess.exec(cmd);
@@ -43,13 +40,6 @@ function openEmail(config, projectName, paths, callback) {
 				line += ' ' + match[1];
 			}
 			contentList.push(line);
-		});
-
-		cp.stderr.on('data', function(stderr){
-			error('[SVN] ' + stderr);
-		});
-
-		cp.on('exit', function() {
 			pathCount--;
 			if (pathCount === 0) {
 				var subject = '版本发布' + (projectName !== '' ? (' - ' + projectName) : '');
@@ -60,7 +50,12 @@ function openEmail(config, projectName, paths, callback) {
 				Util.newMail(config.deploy_mail, subject, content, callback);
 			}
 		});
-	}
+
+		cp.stderr.on('data', function(stderr){
+			pathCount--;
+			Util.error('[SVN] ' + stderr);
+		});
+	});
 }
 
 exports.run = function(args, config) {

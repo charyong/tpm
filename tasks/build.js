@@ -50,22 +50,13 @@ exports.run = function(args, config) {
 
 	// 取得文件SVN版本号
 	function getSvnVersion(pathList, callback) {
+		pathList = _.uniq(pathList);
+
 		var pathCount = pathList.length;
 
 		var result = {};
 
-		for (var i = 0, len = pathList.length; i < len; i++) {
-			var path = pathList[i];
-
-			if (result[path]) {
-				continue;
-			}
-
-			if (!Fs.existsSync(path)) {
-				Util.error('File not found: ' + path);
-				continue;
-			}
-
+		pathList.forEach(function(path) {
 			var cmd = (process.platform === 'win32' ? 'set' : 'export') + ' LANG=en_US && svn info "' + path.replace(/\\/g, '\\\\') + '"';
 
 			var cp = ChildProcess.exec(cmd);
@@ -73,29 +64,23 @@ exports.run = function(args, config) {
 			cp.stdout.on('data', function(stdout) {
 				var data = Iconv.fromEncoding(stdout, 'gbk');
 				var match;
-				if ((match = /^Path:\s*(.+)$/im.exec(data))) {
-					var key = match[1];
-				}
 				if ((match = /^Last Changed Rev:\s*(\d+)$/im.exec(data))) {
 					var value = match[1];
 				}
-				if (key && value) {
-					key = key.substr(0, 1).toLowerCase() + key.substr(1);
-					result[key] = value;
+				if (value) {
+					result[path] = value;
 				}
-			});
-
-			cp.stderr.on('data', function(stderr){
-				Util.error('[SVN] ' + stderr);
-			});
-
-			cp.on('exit', function() {
 				pathCount--;
 				if (pathCount === 0) {
 					callback(result);
 				}
 			});
-		}
+
+			cp.stderr.on('data', function(stderr){
+				pathCount--;
+				Util.error('[SVN] ' + stderr);
+			});
+		});
 	}
 
 	// 图片版本化
@@ -132,7 +117,6 @@ exports.run = function(args, config) {
 			content = content.replace(/\/\*[\S\s]*?\*\/|(url\(")((?:\\"|[^"])+)("\))/g, function(full, prefix, url, suffix) {
 				if (prefix) {
 					var path = url2path(url);
-					path = path.substr(0, 1).toLowerCase() + path.substr(1);
 					if (data[path]) {
 						var version = data[path];
 						var buildPath = addVersion(getBuildPath(path), version);
