@@ -140,6 +140,11 @@ exports.run = function(args, config) {
 		var buildPath = getBuildPath(path);
 		var distPath = getDistPath(path);
 
+		// 延迟加载JS不能单独构建
+		if (/^lazy\//.test(relativePath)) {
+			return;
+		}
+
 		// 把多个文件合并成一个文件
 		if (config.libjs[relativePath]) {
 			var fromPaths = config.libjs[relativePath].map(function(val) {
@@ -172,7 +177,7 @@ exports.run = function(args, config) {
 
 		options._ = [path];
 
-		Ozma()(options, function() {
+		Ozma()(options, function(buildPath, distPath) {
 			Util.setSvnKeywords(buildPath);
 			Util.setSvnKeywords(distPath);
 		});
