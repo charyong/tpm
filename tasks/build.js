@@ -139,14 +139,12 @@ exports.run = function(args, config) {
 					Util.copyFile(path, distPath);
 
 					// 在Windows下优化PNG
-					if (process.platform === 'win32') {
-						var cmd = Path.resolve(__dirname + '/../bin/PngOptimizerCL').replace(/\\/g, '\\\\') + ' -file:"' + distPath.replace(/\\/g, '\\\\') + '"';
+					if (process.platform === 'win32' && /\.png$/i.test(distPath)) {
+						var cmd = '"' + Path.resolve(__dirname + '/../bin/PngOptimizerCL').replace(/\\/g, '\\\\') + '" -file:"' + distPath.replace(/\\/g, '\\\\') + '"';
 
 						console.log(cmd);
 
-						var cp = ChildProcess.exec(cmd, function(error, stdout, stderr) {
-							console.log(error, stdout, stderr);
-						});
+						var cp = ChildProcess.exec(cmd);
 					}
 				}
 			});
