@@ -57,14 +57,16 @@ exports.run = function(args, config) {
 		var result = {};
 
 		pathList.forEach(function(path) {
-			var cmd = (process.platform === 'win32' ? 'set' : 'export') + ' LANG=en_US && svn info "' + path.replace(/\\/g, '\\\\') + '"';
+			var cmd = 'svn info "' + path.replace(/\\/g, '\\\\') + '" --xml';
+
+			console.log(cmd);
 
 			var cp = ChildProcess.exec(cmd);
 
 			cp.stdout.on('data', function(stdout) {
 				var data = Iconv.fromEncoding(stdout, 'gbk');
 				var match;
-				if ((match = /^Last Changed Rev:\s*(\d+)$/im.exec(data))) {
+				if ((match = /<commit\s+revision="(\d+)">/i.exec(data))) {
 					var value = match[1];
 				}
 				if (value) {
@@ -119,17 +121,36 @@ exports.run = function(args, config) {
 					var path = url2path(url);
 					if (data[path]) {
 						var version = data[path];
-						var buildPath = addVersion(getBuildPath(path), version);
-						var distPath = addVersion(getDistPath(path), version);
-
-						Util.copyFile(path, buildPath);
-						Util.copyFile(path, distPath);
-
 						return prefix + addVersion(url, version) + suffix;
 					}
 				}
 				return full;
 			});
+
+			_.each(data, function(version, path) {
+				var buildPath = addVersion(getBuildPath(path), version);
+				var distPath = addVersion(getDistPath(path), version);
+
+				if (!Fs.existsSync(buildPath) || Util.mtime(path) >= Util.mtime(buildPath)) {
+					Util.copyFile(path, buildPath);
+				}
+
+				if (!Fs.existsSync(distPath) || Util.mtime(path) >= Util.mtime(distPath)) {
+					Util.copyFile(path, distPath);
+
+					// 在Windows下优化PNG
+					if (process.platform === 'win32') {
+						var cmd = Path.resolve(__dirname + '/../bin/PngOptimizerCL').replace(/\\/g, '\\\\') + ' -file:"' + distPath.replace(/\\/g, '\\\\') + '"';
+
+						console.log(cmd);
+
+						var cp = ChildProcess.exec(cmd, function(error, stdout, stderr) {
+							console.log(error, stdout, stderr);
+						});
+					}
+				}
+			});
+
 			callback(content);
 		});
 	}

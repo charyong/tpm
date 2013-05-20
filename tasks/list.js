@@ -25,7 +25,7 @@ function openEmail(config, projectName, paths, callback) {
 	contentList.push('文件列表：');
 
 	paths.forEach(function(path) {
-		var cmd = (process.platform === 'win32' ? 'set' : 'export') + ' LANG=en_US && svn info "' + path.replace(/\\/g, '\\\\') + '"';
+		var cmd = 'svn info "' + path.replace(/\\/g, '\\\\') + '" --xml';
 
 		var cp = ChildProcess.exec(cmd);
 
@@ -33,10 +33,10 @@ function openEmail(config, projectName, paths, callback) {
 			var data = Iconv.fromEncoding(stdout, 'gbk');
 			var match;
 			var line = '';
-			if ((match = /^URL:\s*(.+)$/im.exec(data))) {
+			if ((match = /<url>(.+?)<\/url>/i.exec(data))) {
 				line += match[1];
 			}
-			if ((match = /^Last Changed Rev:\s*(\d+)$/im.exec(data))) {
+			if ((match = /<commit\s+revision="(\d+)">/i.exec(data))) {
 				line += ' ' + match[1];
 			}
 			contentList.push(line);

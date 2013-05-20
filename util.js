@@ -1,6 +1,7 @@
 
 var Path = require('path');
 var Fs = require('fs');
+var util = require('util');
 var Iconv = require('iconv-lite');
 var UglifyJs = require('uglify-js');
 var CleanCss = require('clean-css');
@@ -102,6 +103,11 @@ function readFileSync(filePath, encoding) {
 function writeFileSync(filePath, content) {
 	mkdir(Path.dirname(filePath), '0777');
 	Fs.writeFileSync(filePath, content);
+}
+
+function mtime(filePath) {
+	var stat = Fs.statSync(filePath);
+	return stat.mtime.getTime();
 }
 
 function copyFile(fromPath, toPath) {
@@ -293,6 +299,7 @@ exports.indir = indir;
 exports.mkdir = mkdir;
 exports.readFileSync = readFileSync;
 exports.writeFileSync = writeFileSync;
+exports.mtime = mtime;
 exports.copyFile = copyFile;
 exports.minJs = minJs;
 exports.minCss = minCss;
