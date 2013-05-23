@@ -95,10 +95,11 @@ exports.run = function(args, config) {
 			var lines = content.split(/\r\n|\n/);
 
 			lines.forEach(function(line) {
-				//line = Util.trim(line);
-				var match;
-				if ((match = /^[MA]M?\s+(.*)$/.exec(line))) {
-					pathList.push(match[1]);
+				if (/\.\w+$/.test(line)) {
+					var match;
+					if ((match = /^[MA]M?\s+(.*)$/.exec(line))) {
+						pathList.push(match[1]);
+					}
 				}
 			});
 

@@ -174,11 +174,7 @@ function setSvnKeywords(path) {
 
 	console.log(cmd);
 
-	ChildProcess.exec(cmd, function(err, stdout, stderr){
-		if (err !== null) {
-			return error('[SVN] ' + err);
-		}
-	});
+	ChildProcess.exec(cmd);
 }
 
 // @param type: "src", "build", "dist"
