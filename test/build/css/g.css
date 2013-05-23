@@ -32,18 +32,18 @@ body {
   color: #000;
   background: #fff;
   font-size: 12px;
-  
+  /* 将1em定义为12px，除表单元素以外的所有元素都会继承 */
 
   line-height: 1.25;
-  
+  /* 12px字体行高15px，这样FF下Tahoma的下划线才会出来 */
 
   font-family: tahoma,arial,\5b8b\4f53,sans-serif;
-  
+  /* 除表单元素以外的所有元素都会继承 */
 
 }
 th,
 td {
-  
+  /* 让表格里的内容左对齐、上对齐 */
 
   text-align: left;
   vertical-align: top;
@@ -54,7 +54,7 @@ h3,
 h4,
 h5,
 h6 {
-  
+  /* 这几个标签在不同的浏览器里默认的大小不一样，不能指望使用默认大小 */
 
   font-size: 1em;
   font-weight: normal;
@@ -82,11 +82,11 @@ li {
   list-style: none;
 }
 ol {
-  
+  /* 这里有个小默契，对于列表，请设置l外层的ul或ol，而不是设置li */
 
   padding: 0 0 0 2em;
 }
-
+/* 设置各表单元素的样式 */
 input,
 label,
 select,
@@ -95,7 +95,7 @@ textarea,
 button,
 fieldset,
 legend {
-  
+  /* 表单元素不继承body的字体属性，需重新定义 */
 
   font-size: 1em;
   font-family: tahoma,arial,\5b8b\4f53,sans-serif;
@@ -107,7 +107,7 @@ textarea {
   -webkit-border-radius: 0;
   outline: none;
 }
-
+/* for iOS */
 input.text {
   color: #444;
   border-color: #9f9f9f #dcdcdc #dcdcdc #9f9f9f;
@@ -125,7 +125,7 @@ input.radio,
 input.checkbox {
   margin-left: -2px;
 }
-
+/* hacked for IE 6 7*/
 label.radio,
 label.checkbox {
   margin-right: 5px;
@@ -137,9 +137,9 @@ textarea {
   padding: 1px;
   resize: none;
 }
-
+/* 工具箱 */
 .fix:after {
-  
+  /* 闭合容器 */
 
   content: ".";
   display: block;
@@ -151,14 +151,14 @@ textarea {
   display: inline-block;
   min-height: 1%;
 }
-
+/* Hides from IE-mac \*/
 *html .fix {
   zoom: 1;
 }
 .fix {
   display: block;
 }
-
+/* Hide from IE-mac ends */
 .clearleft {
   clear: left;
 }
@@ -197,7 +197,7 @@ textarea {
 .g_notify .btn:active {
   background: #f1f1f1;
 }
-
+/* 布局 */
 .page_content,
 .frame_2cols {
   clear: both;
@@ -214,13 +214,13 @@ textarea {
   clear: both;
   visibility: hidden;
 }
-
+/* wrappit */
 .main_col,
 .side_col {
   _overflow: hidden;
 }
-
-
+/*防止在IE里撑开破掉*/
+/* Mask */
 .tui_mask {
   position: absolute;
   top: 0px;
@@ -229,7 +229,7 @@ textarea {
   filter: alpha(opacity=30);
   opacity: 0.3;
 }
-
+/* Global Nav 2012 Early */
 .g-top {
   min-width: 980px;
   height: 146px;
@@ -237,7 +237,10 @@ textarea {
   position: relative;
   z-index: 10001;
 }
-
+/*.g-bar { height: 26px; border-bottom: 1px solid #d2d2d2; background: url("@{imgPath}/g/ui/nav/v_v3.png") 0 -50px repeat-x; clear: both; position: relative; z-index: 10001; }
+.g-bar-main { width: 980px; margin: 0 auto; }
+.g-bar-link { float: left; width: 450px; padding: 6px 0 0 13px; }
+.g-bar-user { float: right; padding: 2px 4px 0; }*/
 .g_main {
   width: 100%;
   height: 93px;
@@ -337,7 +340,7 @@ textarea {
   width: 16px;
   background: url("../img/g/ui/nav/v2.png") -98px -90px no-repeat;
 }
-
+/* 频道等二级导航 */
 .g_subnav {
   width: 100%;
   height: 39px;
@@ -412,13 +415,13 @@ textarea {
 .g-top .g-user .g-upload {
   display: none;
 }
-
+/* logo右侧图标链接 */
 #specialogo {
   position: absolute;
   top: 9px;
   left: 200px;
 }
-
+/* 导航全站、播放页公用部分 */
 .g-link {
   height: 14px;
   position: relative;
@@ -491,7 +494,7 @@ textarea {
   cursor: pointer;
   border-radius: 0;
 }
-
+/*.g-top .g-search-submit:hover { background-position: -107px -570px; }*/
 .g-mini-search {
   float: left;
   width: 241px;
@@ -587,7 +590,7 @@ textarea {
   line-height: 18px\9;
   *line-height: 18px;
 }
-
+/* 底部 */
 .g-bot {
   min-width: 980px;
   margin: 0;
@@ -721,7 +724,7 @@ textarea {
 .g-licence ul.last {
   margin: 0;
 }
-
+/* 搜索提示 */
 .g-search .gst {
   width: 362px;
   margin: 0;
@@ -769,7 +772,7 @@ textarea {
 .g-search .gst .chosen a {
   background: #ffebdd;
 }
-
+/*.g-search .gst .chosen em { color: #fff; }*/
 .g-search .search_hint {
   background: #ffe;
   padding: 5px;
@@ -823,7 +826,7 @@ textarea {
 .g-bot .g-mini-search .gst ul {
   border-radius: 2px 2px 0 0;
 }
-
+/* 用户栏 */
 .g-user {
   position: absolute;
   top: 28px;
@@ -1097,7 +1100,7 @@ textarea {
 .g-user-nav .i_11 a:hover b {
   background-position: -160px -225px;
 }
-
+/* 观看记录 */
 .g-viewlist-nav {
   display: none;
   width: 212px;
@@ -1181,7 +1184,7 @@ textarea {
   white-space: nowrap;
   text-align: left;
 }
-
+/* fix 登录页, TODO vr_title */
 .viewRecord_item .vr_title {
   padding: 0;
   font-size: 12px;
@@ -1296,7 +1299,7 @@ textarea {
   top: 28px;
   width: 246px;
 }
-
+/* Mini Nav 2012 Early */
 .g-mini {
   min-width: 980px;
   height: 34px;
@@ -1364,7 +1367,7 @@ textarea {
   overflow: hidden;
   background: url("../img/g/ui/nav/v2.png") 0 -510px no-repeat;
 }
-
+/* 导航面包屑 */
 .vcate {
   width: 980px;
   height: 14px;
@@ -1395,7 +1398,7 @@ textarea {
 .vcate .last {
   background: none;
 }
-
+/* 更多菜单 */
 .g-link .active .g-more-nav {
   display: block;
 }
@@ -1566,7 +1569,7 @@ textarea {
   text-align: center;
   cursor: pointer;
 }
-
+/* quickplaylist */
 .pack .pic .quick {
   font-size: 8px;
   width: 14px;
@@ -1593,7 +1596,7 @@ textarea {
   _zoom: 1;
   _bottom: 2px;
 }
-
+/* hacked for IE 6 */
 .banPublic {
   background: url("../img/g/ui/pack/i_v6.png") no-repeat 0 -126px;
   height: 14px;
@@ -1603,7 +1606,9 @@ textarea {
   width: 14px;
   z-index: 10;
 }
-
+/**
+ * TUI Dialog Style
+ */
 .tui_dialog {
   background: #fff;
   *background: #ffffff url("../img/g/ui/panel/ba.png") -10000px 0 no-repeat;
@@ -1619,7 +1624,7 @@ textarea {
 .tui_dialog_holder {
   width: 450px;
 }
-
+/* ie style ====================== */
 .tui_dialog_wrap {
   border-left: 4px solid #e9e9e9;
   border-right: 4px solid #e9e9e9;
@@ -1699,7 +1704,7 @@ textarea {
 .tudou_dialog .tui_dialog_wrap .tui_dialog_w_br {
   background-position: -15px -5px;
 }
-
+/* end =========================== */
 .tui_dialog_header {
   height: 28px;
   background: #808080 url("../img/g/ui/panel/pimg.png") 0 -35px repeat-x;
@@ -1754,7 +1759,7 @@ textarea {
 .td_iframe_panel .tui_dialog_content {
   overflow: hidden;
 }
-
+/* TUI.panel */
 .tudou_dialog {
   position: fixed;
   cursor: default;
@@ -1800,7 +1805,7 @@ textarea {
   overflow: hidden;
   outline: none;
 }
-
+/* .tudou_dialog .tui_dialog_button a.p_btn_0, */
 .tudou_dialog .tui_dialog_button a:hover {
   background-position: 0 -105px;
 }
@@ -1820,7 +1825,7 @@ textarea {
 .finish .tui_dialog_logo {
   background-position: -80px 0;
 }
-
+/* 带箭头的文字提示框 */
 .t_prompt {
   width: 250px;
   padding: 0;
@@ -1843,7 +1848,7 @@ textarea {
   font-style: normal;
   color: #f00;
 }
-
+/* mes_box 自适应消息框 */
 .tui_mesbox {
   position: absolute;
   right: 0;
@@ -1972,7 +1977,9 @@ textarea {
   position: absolute;
   z-index: 10005;
 }
-
+/**
+ * 土豆徽章
+ */
 .dou_title {
   display: block;
   text-indent: -999px;
@@ -1980,15 +1987,15 @@ textarea {
   height: 32px;
   background: url("../img/g/badge_v4.png") no-repeat 0 0;
 }
-
+/* 豆角 */
 .dou_director {
   background-position: 0 0;
 }
-
+/* 豆地主 */
 .dou_lord {
   background-position: -40px 0;
 }
-
+/* 豆花 */
 .dou_lv {
   background-position: 0 -40px;
 }
@@ -2052,7 +2059,7 @@ textarea {
 .dou_lv_20 {
   background-position: -80px -120px;
 }
-
+/*豆级*/
 .lvl {
   display: inline-block;
   width: 55px;
@@ -2068,11 +2075,11 @@ textarea {
   *zoom: 1;
   *vertical-align: baseline;
 }
-
+/*IE模拟inline-block*/
 * .lvl {
   _margin: 0 0 -3px;
 }
-
+/*IE6*/
 .lvl span {
   display: none;
 }
@@ -2189,11 +2196,11 @@ textarea {
   *zoom: 1;
   *vertical-align: baseline;
 }
-
+/*IE模拟inline-block*/
 * .douhua {
   _margin: 0 0 -3px;
 }
-
+/*IE6*/
 .douhua span {
   display: none;
 }
@@ -2271,7 +2278,7 @@ textarea {
   background-position: 70px -340px;
   width: 65px;
 }
-
+/* outer site login */
 .tudou_oauth_panel .tui_panel_holder {
   width: 380px;
 }
@@ -2361,7 +2368,7 @@ textarea {
   position: relative;
   top: 8px;
 }
-
+/*oauth_tip_panel*/
 .oauth_tip_panel .tui_panel_holder {
   width: 380px;
 }
@@ -2393,7 +2400,7 @@ textarea {
 .oauth_tip_panel .tui_panel_button .p_btn_1 {
   display: none;
 }
-
+/*mini_login*/
 .login_dialog {
   border-radius: 4px;
   border-width: 0;
@@ -2505,7 +2512,7 @@ p.summary {
   margin-bottom: 0;
   text-justify: inter-ideograph;
 }
-
+/* 左图右字 较宽 */
 .pack_video .pic {
   position: relative;
   float: left;
@@ -2557,7 +2564,7 @@ p.summary {
 .pack_video_brief .txt {
   margin: 2px 0 0 129px;
   *zoom: 1;
-  
+  /*IE下.txt会“继承”h3的下边距*/
 
 }
 .pack_video_brief .caption {
@@ -2570,7 +2577,7 @@ p.summary {
   overflow: hidden;
 }
 .pack_video_card {
-  
+  /* 上图下字 较窄 */
 
   width: 122px;
   overflow: hidden;
@@ -2629,7 +2636,7 @@ p.summary {
   font-size: 0;
   content: '.';
 }
-
+/* for chrome */
 .g_vip2 {
   background-position: 1px -240px;
 }
@@ -2678,7 +2685,7 @@ p.summary {
 .pack .vhd720 {
   background-position: -70px -280px;
 }
-
+/* play and comment counts */
 .pack .d_nums span {
   font-size: 11px;
   cursor: default;
@@ -2691,7 +2698,7 @@ p.summary {
   padding: 0 0 0 19px;
   background: url("../img/g/ui/pack/i_v6.png") -118px -128px no-repeat;
 }
-
+/* black transparent layer */
 .pack .pic .vpbg {
   width: 132px;
   height: 20px;
@@ -2739,7 +2746,7 @@ p.summary {
   left: 1px;
   bottom: 5px;
 }
-
+/* IE6 1px gap fix */
 * .pack .pic .vpbg,
 * .pack .pic .vinf {
   _bottom: -1px;
@@ -2756,7 +2763,7 @@ p.summary {
 * .pack_playlist_brief .pic .vinf {
   _bottom: 4px;
 }
-
+/* 2012 new playlist pack */
 .pack.pack_plist_card {
   width: 132px;
 }
@@ -2844,7 +2851,7 @@ p.summary {
   overflow: hidden;
   white-space: nowrap;
 }
-
+/* 左图右字 适用于窄栏 */
 .pack_playlist_brief .pic {
   position: relative;
   float: left;
@@ -2862,7 +2869,7 @@ p.summary {
 .pack_playlist_brief .txt {
   margin: 2px 0 0 129px;
   *zoom: 1;
-  
+  /*IE下.txt会“继承”h3的下边距*/
 
 }
 .pack_playlist_brief .caption {
@@ -2879,7 +2886,7 @@ p.summary {
   _white-space: normal;
 }
 .pack.pack_playlist_card {
-  
+  /* 上图下字 */
 
   width: 122px;
   overflow: hidden;
@@ -2904,7 +2911,7 @@ p.summary {
   margin: 0 0 2px 0;
   max-height: 36px;
   overflow: hidden;
-  
+  /*	playlist card的标题允许两行	*/
 
 }
 .pack_playlist_card ul.info li {
@@ -2918,7 +2925,7 @@ p.summary {
   background: url("../img/g/v_v10.png") no-repeat 0 -520px;
   padding-left: 15px;
 }
-
+/* 上图下字 */
 .pack.pack_user_card {
   width: 90px;
   overflow: hidden;
@@ -2950,7 +2957,7 @@ p.summary {
   height: 18px;
   overflow: hidden;
 }
-
+/*头像*/
 .avatar {
   border: 1px solid #ccc;
   padding: 3px;
@@ -2965,7 +2972,7 @@ p.summary {
   height: 82px;
   overflow: hidden;
   background: #fff;
-  
+  /*遮住大头贴*/
 
 }
 .avatar img {
@@ -2991,7 +2998,7 @@ p.summary {
   width: 48px;
   height: 48px;
   background: #fff;
-  
+  /*遮住大头贴*/
 
 }
 .avatar_s img {
@@ -3016,7 +3023,7 @@ p.summary {
   width: 40px;
   height: 40px;
   background: #fff;
-  
+  /*遮住大头贴*/
 
 }
 .avatar_xs img {
@@ -3056,7 +3063,7 @@ form p:after {
 }
 a.more {
   background: url("../img/g/v_v10.png") right -406px no-repeat;
-  
+  /* 更多的双箭头*/
 
   padding: 0 10px 0 0;
   text-decoration: none;
@@ -3127,7 +3134,7 @@ a.more {
   margin: 0 20px 0 0;
   overflow: hidden;
 }
-
+/* adextentsion容器样式 */
 .ad_box,
 .ad_banner {
   display: none;
@@ -3217,12 +3224,12 @@ a.more {
 .seedplayerbox .tcmt {
   display: none;
 }
-
+/* 不展开看板 */
 #adex_board.adex_unity,
 #adex_board.adex_unity .adex_boardbox {
   height: 245px;
 }
-
+/*  破格广告 */
 #adex_seed.superSeedBox {
   width: 980px;
   height: 0px;
@@ -3255,8 +3262,8 @@ a.more {
   z-index: 90;
   zoom: 1;
 }
-
-
+/* adextension end */
+/*无flash容器样式*/
 .tui_noflash,
 .tui_noflashPlayer {
   background: #000;
