@@ -253,6 +253,7 @@ function newMail(to, subject, body, callback) {
 	});
 }
 
+// Grep target paths
 function grepPaths(rootDirPath, checkFn) {
 	var paths = [];
 
@@ -281,6 +282,55 @@ function grepPaths(rootDirPath, checkFn) {
 	walk(rootDirPath);
 
 	return paths;
+}
+
+// Grep dependencies for AMD module
+function grepAmdDeps(path, root) {
+
+	var pathMap = {};
+
+	function walk(src) {
+		var regExp = /(^|[^\S\n\r]*)(require|define)\(\s*\[[^\]]*\]/g;
+
+		var RE_REQUIRE_DEPS = /(^|[^\S\n\r]*)(require\(\s*)(\[[^\]]*\])/g;
+		var RE_DEFINE_DEPS = /(^|[^\S\n\r]*)(define\(\s*[^\[\),]+,\s*)(\[[^\]]*\])/g;
+		var match;
+
+		while((match = regExp.exec(src))) {
+			var filePath = match[1];
+
+			if (!/^(js|skin)\//.test(filePath)) {
+				filePath = subDir + '/' + filePath;
+			}
+
+			var path = root + '/' + filePath;
+
+			if (typeof pathMap[filePath] == 'undefined') {
+				var encoding = /\.tpl$/.test(filePath) ? 'utf8' : 'gbk';
+
+				var fileStr = Util.readFileSync(path, encoding);
+
+				if (/\.(js|css)$/.test(filePath)) {
+					walk(fileStr);
+				}
+
+				pathMap[filePath] = fileStr;
+			}
+		}
+	}
+
+	// 二进制文件
+	if (!/(\.js|\.css|\.tpl)$/.test(path)) {
+		var contentType = Mime.lookup(path);
+		var buffer = Util.readFileSync(path);
+
+		return callback(contentType, buffer);
+	}
+
+	// 文本文件
+	var src = Util.readFileSync(path, 'gbk');
+
+	grepPath(src);
 }
 
 exports.linefeed = linefeed;

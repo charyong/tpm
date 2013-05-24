@@ -5,20 +5,14 @@ TPM是前端打包工具。
 
 ## 安装
 
-1. 源代码安装
-	```
-	git clone git://github.com/tudouui/tpm.git
-	```
-
-2. NPM安装
-	```
-	npm install tpm -g
-	```
+```
+npm install tpm -g
+```
 
 ## 使用方法
 
 ```bash
-ytpm [command]
+ytpm [COMMAND]
 ```
 
 ### 目录结构
