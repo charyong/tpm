@@ -13,6 +13,7 @@ var TASK_MAP = {
 	cleanup : true,
 	tui2build : true,
 	tui2min : true,
+	vm: true
 };
 
 Optimist.usage([
