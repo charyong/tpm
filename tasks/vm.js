@@ -1,4 +1,3 @@
-
 var Path = require('path');
 var Fs = require('fs');
 var Ssh = require('ssh2');
@@ -54,7 +53,7 @@ function uploadTemplate(mgr3, config, path){
 			return;
 		}
 
-		Util.info('[Upload Manage3] ==================== ok');
+		Util.info('[Upload Manage3] '+ path +' ok');
 
 		var manage3 = connectManage3(mgr3);
 
@@ -77,7 +76,7 @@ function uploadTemplate(mgr3, config, path){
 				});
 				stream.on('exit', function(code, signal) {
 					if (code == 0) {
-						Util.info('[Upload VM] ========================= success');
+						Util.info('[Upload VM] '+ path +' success');
 					}
 					manage3.end();
 				});
