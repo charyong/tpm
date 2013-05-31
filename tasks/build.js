@@ -191,7 +191,11 @@ exports.run = function(args, config) {
 		var relativePath = getRelativePath(path, 'js');
 
 		if (config.globaljs.indexOf(relativePath) < 0) {
-			options.config.ignore = config.ignore;
+			if (/^(module|page|lazy)\/mobile\//.test(relativePath)) {
+				options.config.ignore = config.mobileIgnore;
+			} else {
+				options.config.ignore = config.ignore;
+			}
 		}
 
 		options._ = [path];
@@ -286,6 +290,11 @@ exports.run = function(args, config) {
 				pathList.push(path);
 			}
 		}
+
+		// grep ignore module
+		var jsDirPath = config.root + '/src/js';
+		config.ignore = Util.grepDepList(jsDirPath + '/g.js', jsDirPath, true);
+		config.mobileIgnore = Util.grepDepList(jsDirPath + '/m.js', jsDirPath, true);
 
 		buildFiles(pathList);
 	}

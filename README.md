@@ -83,4 +83,3 @@ ytpm cleanup
 * main：JS和CSS入口文件。
 * libjs：全局非AMD文件。
 * globaljs：全局入口文件。
-* ignore：要忽略的模块列表，构建非全局JS文件时使用。

@@ -11,9 +11,10 @@ var TASK_MAP = {
 	deploy : true,
 	list : true,
 	cleanup : true,
+	check : true,
 	tui2build : true,
 	tui2min : true,
-	vm: true
+	vm : true,
 };
 
 Optimist.usage([

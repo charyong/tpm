@@ -3,6 +3,7 @@ var Path = require('path');
 var Fs = require('fs');
 var util = require('util');
 var Iconv = require('iconv-lite');
+var _ = require('underscore');
 var UglifyJs = require('uglify-js');
 var CleanCss = require('clean-css');
 var ChildProcess = require('child_process');
@@ -27,11 +28,6 @@ function each(obj, fn) {
 		}
 
 	}
-}
-
-function trim(str) {
-	// Forgive various special whitespaces, e.g. &nbsp;(\xa0).
-	return str.replace(/(?:^[ \t\n\r]+)|(?:[ \t\n\r]+$)/g, '');
 }
 
 function undef(val, defaultVal) {
@@ -181,12 +177,12 @@ function setSvnKeywords(path) {
 function readProjectFile(config, path, type) {
 	var content = Fs.readFileSync(path, 'utf-8');
 
-	var paths = trim(content).split(/\r\n|\n/);
+	var paths = content.trim().split(/\r\n|\n/);
 
 	var pathList = [];
 
 	for (var i = 0, len = paths.length; i < len; i++) {
-		var path = trim(paths[i]);
+		var path = paths[i].trim();
 
 		if (path == '' || path.charAt(0) == '#') {
 			continue;
@@ -285,58 +281,79 @@ function grepPaths(rootDirPath, checkFn) {
 }
 
 // Grep dependencies for AMD module
-function grepAmdDeps(path, root) {
+function grepDepList(path, root, recursion) {
 
-	var pathMap = {};
+	var depMap = {};
 
-	function walk(src) {
-		var regExp = /(^|[^\S\n\r]*)(require|define)\(\s*\[[^\]]*\]/g;
+	function walk(path, isMain) {
+		var fileStr = readFileSync(path, 'utf8');
 
-		var RE_REQUIRE_DEPS = /(^|[^\S\n\r]*)(require\(\s*)(\[[^\]]*\])/g;
-		var RE_DEFINE_DEPS = /(^|[^\S\n\r]*)(define\(\s*[^\[\),]+,\s*)(\[[^\]]*\])/g;
+		if (isMain) {
+			var regExp = /(?:^|[^\w\.])require\(\s*(?:\[([^\]]*)\]|'([^']*)'|"([^"]*)")/g;
+		} else {
+			var regExp = /(?:^|[^\w\.])define\(\s*(?:(?:'[^']*'|"[^"]*")\s*,)?\s*(?:\[([^\]]*)\]|'([^']*)'|"([^"]*)")/g;
+		}
+
 		var match;
 
-		while((match = regExp.exec(src))) {
-			var filePath = match[1];
+		while((match = regExp.exec(fileStr))) {
+			var depIds = [];
 
-			if (!/^(js|skin)\//.test(filePath)) {
-				filePath = subDir + '/' + filePath;
+			if (match[1]) {
+				depIds = match[1].split(',').map(function(val) {
+					val = val.trim();
+					return val.substr(1, val.length - 2);
+				});
+			} else {
+				depIds = [match[3] || match[2]];
 			}
 
-			var path = root + '/' + filePath;
+			depIds.forEach(function(id) {
+				if (id) {
+					if (id.charAt(0) === '.') {
+						var filePath = Path.resolve(Path.dirname(path), id + '.js');
+					} else {
+						var filePath = Path.resolve(root + '/' + id + '.js');
+					}
 
-			if (typeof pathMap[filePath] == 'undefined') {
-				var encoding = /\.tpl$/.test(filePath) ? 'utf8' : 'gbk';
+					id = Path.relative(root, filePath).split(Path.sep).join('/').replace(/\.js$/, '');
 
-				var fileStr = Util.readFileSync(path, encoding);
-
-				if (/\.(js|css)$/.test(filePath)) {
-					walk(fileStr);
+					if (typeof depMap[id] == 'undefined') {
+						depMap[id] = true;
+						if (recursion) {
+							walk(filePath, false);
+						}
+					}
 				}
-
-				pathMap[filePath] = fileStr;
-			}
+			});
 		}
 	}
 
-	// 二进制文件
-	if (!/(\.js|\.css|\.tpl)$/.test(path)) {
-		var contentType = Mime.lookup(path);
-		var buffer = Util.readFileSync(path);
+	walk(path, true);
 
-		return callback(contentType, buffer);
+	return Object.keys(depMap);
+}
+
+// Grep module ID list
+function grepModuleList(path) {
+	var fileStr = readFileSync(path, 'utf8');
+
+	var regExp = /(?:^|[^\w\.])define\(\s*(?:'([^']*)'|"([^"]*)")\s*,/g;
+
+	var idMap = {};
+
+	var match;
+
+	while((match = regExp.exec(fileStr))) {
+		idMap[match[2] || match[1]] = true;
 	}
 
-	// 文本文件
-	var src = Util.readFileSync(path, 'gbk');
-
-	grepPath(src);
+	return Object.keys(idMap);
 }
 
 exports.linefeed = linefeed;
 exports.banner = banner;
 exports.each = each;
-exports.trim = trim;
 exports.undef = undef;
 exports.info = info;
 exports.warn = warn;
@@ -354,3 +371,5 @@ exports.setSvnKeywords = setSvnKeywords;
 exports.readProjectFile = readProjectFile;
 exports.newMail = newMail;
 exports.grepPaths = grepPaths;
+exports.grepDepList = grepDepList;
+exports.grepModuleList = grepModuleList;
