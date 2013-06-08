@@ -1,4 +1,3 @@
-
 var Path = require('path');
 var Fs = require('fs');
 var Optimist = require('optimist');
@@ -68,24 +67,30 @@ if (!dirStat.isDirectory()) {
 
 dirPath = Path.resolve(dirPath);
 
-while (true) {
-	var path = Util.undef(ARGV.config, dirPath + '/tpm-config.js');
+var path = Util.undef(ARGV.config, './tpm-config.js');
+path = Path.resolve(path);
 
-	path = Path.resolve(path);
+if (Fs.existsSync(path)) {
+	config = require(path);
+}else{
+	while (true) {
+		path = Path.resolve(dirPath + '/tpm-config.js');
 
-	if (Fs.existsSync(path)) {
-		config = require(path);
-		break;
+		if (Fs.existsSync(path)) {
+			config = require(path);
+			break;
+		}
+
+		var parentPath = Path.dirname(dirPath);
+
+		if (parentPath == dirPath) {
+			break;
+		}
+
+		dirPath = parentPath;
 	}
-
-	var parentPath = Path.dirname(dirPath);
-
-	if (parentPath == dirPath) {
-		break;
-	}
-
-	dirPath = parentPath;
 }
+
 
 if (config === null) {
 	Util.error('File not found: tpm-config.js');
