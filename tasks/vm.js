@@ -7,7 +7,7 @@ var Util = require(__dirname + '/../util');
 
 var DEPLOY_USAGE = 'Usage: tpm vm [vmPath] [ENV]\n\n' +
 	'Examples:\n' +
-	'tpm vm viewX.vm tditem_wwwtest\n';
+	'tpm vm viewX.vm wwwtest\n';
 
 
 function connectManage3(sshConfig){
@@ -86,19 +86,57 @@ function uploadTemplate(mgr3, config, path){
 	});
 }
 
+// 通过地址获取对应环境参数
+function getServerEnv(path, env, config){
+	var PROJECTS = config.project
+		, project
+	path = __lettersToLowercase(Path.normalize(path));
+	for(var i in PROJECTS){
+		var item = Path.normalize(PROJECTS[i]);
+		//console.log('getServerEnv', path,  __lettersToLowercase(item),  path.indexOf( __lettersToLowercase(item) ) === 0);
+		if(path.indexOf( __lettersToLowercase(item) ) === 0){
+			project = i;
+			break;
+		}
+	}
+	if(!project){ // 文件不在现有项目列表中
+		Util.error('[VM getEnv] failed: File is not in the list of existing projects.');
+		return;
+	}
+
+	if(!config.server || !config.server[env]){
+		Util.error('[VM getEnv] failed: config.server['+ env +'] not set.');
+		return;
+	}
+
+	if(!config.server[env][project]){
+		Util.error('[VM getEnv] failed: '+ project +'Evn-configs not set in '+ env +' env.');
+		return;
+	}
+	return config.server[env][project];
+}
+//盘符改为小写
+function __lettersToLowercase(path){
+	return path.replace(/^\w:/, function($1){
+		return $1.toLowerCase();
+	});
+}
+
 
 exports.run = function(args, config) {
-
 	if (args.length < 2) {
 		console.log(DEPLOY_USAGE);
 		return;
 	}
 
-	var path = args[0];
-	var env = args[1];
+	var env = args.pop(); // 最后一个参数为环境
+	var index  = 0, len = args.length;
 
-	path = Path.resolve(path);
+	var path = Path.resolve(args[index]);
+	var serverEnv = getServerEnv(path, env, config);
 
-	uploadTemplate(config.ssh.manage3, config.ssh[env], path);
-
+	if(serverEnv){
+		uploadTemplate(config.ssh.manage3, serverEnv, path);
+	}
 };
+
