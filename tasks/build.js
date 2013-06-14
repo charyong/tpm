@@ -29,6 +29,13 @@ exports.run = function(args, config) {
 		return Path.resolve(config.root + '/dist/' + relativePath.replace(/\.less$/, '.css'));
 	}
 
+	// 获取src路径
+	function getSrcPath(path) {
+		var dirPath = Path.resolve(config.root + '/dist');
+		var relativePath = Path.relative(dirPath, path).split(Path.sep).join('/');
+		return Path.resolve(config.root + '/src/' + relativePath.replace(/\.css$/, '.less'));
+	}
+
 	// 是否可构建的文件
 	function canBuild(path) {
 		if (!Util.indir(path, Path.resolve(config.root + '/src')) && !Util.indir(path, Path.resolve(config.root + '/project'))) {
@@ -96,6 +103,7 @@ exports.run = function(args, config) {
 			} else if (url.charAt(0) == '/') {
 				path = Path.resolve(config.root + '/../' + url);
 			}
+			path = getSrcPath(path);
 			return path;
 		}
 
