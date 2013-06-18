@@ -1,4 +1,3 @@
-
 var Path = require('path');
 var Fs = require('fs');
 var Iconv = require('iconv-lite');
@@ -33,7 +32,11 @@ exports.run = function(args, config) {
 	function getSrcPath(path) {
 		var dirPath = Path.resolve(config.root + '/dist');
 		var relativePath = Path.relative(dirPath, path).split(Path.sep).join('/');
-		return Path.resolve(config.root + '/src/' + relativePath.replace(/\.css$/, '.less'));
+		if (relativePath.indexOf('/') > -1) {
+			return Path.resolve(config.root + '/src/' + relativePath.replace(/\.css$/, '.less'));
+		} else {
+			return '';
+		}
 	}
 
 	// 是否可构建的文件
@@ -127,7 +130,7 @@ exports.run = function(args, config) {
 			content = content.replace(/\/\*[\S\s]*?\*\/|(url\(")((?:\\"|[^"])+)("\))/g, function(full, prefix, url, suffix) {
 				if (prefix) {
 					var path = url2path(url);
-					if (data[path]) {
+					if (path && data[path]) {
 						var version = data[path];
 						return prefix + addVersion(url, version) + suffix;
 					}
