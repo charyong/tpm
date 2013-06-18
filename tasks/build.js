@@ -32,7 +32,7 @@ exports.run = function(args, config) {
 	function getSrcPath(path) {
 		var dirPath = Path.resolve(config.root + '/dist');
 		var relativePath = Path.relative(dirPath, path).split(Path.sep).join('/');
-		if (relativePath.indexOf('/') > -1) {
+		if (Path.extname(relativePath)) {
 			return Path.resolve(config.root + '/src/' + relativePath.replace(/\.css$/, '.less'));
 		} else {
 			return '';
