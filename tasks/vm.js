@@ -39,6 +39,7 @@ function connectManage3(sshConfig){
 function uploadTemplate(mgr3, config, path){
 
 	var fileName = Path.basename(path);
+	var relativePath = Path.relative(config.localRoot, path).split(Path.sep).join('/');
 
 	var options = {
 		host: mgr3.host,
@@ -59,8 +60,10 @@ function uploadTemplate(mgr3, config, path){
 
 		manage3.on('ready', function(){
 
-			var remotePath = config.root + fileName;
+			var remotePath = config.root + relativePath;
 			var cmd = ['scp', fileName, config.user + '@' + config.host + ':' + remotePath].join(' ');
+
+			Util.info('[SCP] ' + path + ' -> ' + remotePath);
 
 			manage3.exec(cmd, function(err, stream){
 				if (err) {
@@ -113,6 +116,8 @@ function getServerEnv(path, env, config){
 		Util.error('[VM getEnv] failed: '+ project +'Evn-configs not set in '+ env +' env.');
 		return;
 	}
+	config.server[env][project].localRoot = PROJECTS[project];
+
 	return config.server[env][project];
 }
 //盘符改为小写
