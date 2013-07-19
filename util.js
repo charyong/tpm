@@ -150,6 +150,10 @@ function minCss(fromPath, toPath, charset) {
 function concatFile(fromPaths, toPath, charset) {
 	charset = charset || 'utf-8';
 
+	if (fromPaths.length == 1 && fromPaths[0] == toPath) {
+		return;
+	}
+
 	console.log('Concat files:');
 
 	var contentList = [];
