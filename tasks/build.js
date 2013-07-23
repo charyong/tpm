@@ -81,7 +81,6 @@ exports.run = function(args, config) {
 				}
 				if (value) {
 					result[path] = value;
-					console.log(value, pathCount)
 				}
 				pathCount--;
 				if (pathCount === 0) {
