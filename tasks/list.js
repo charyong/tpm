@@ -89,7 +89,7 @@ exports.run = function(args, config) {
 			process.exit();
 		});
 
-		cp.on('exit', function() {
+		cp.on('close', function() {
 			var pathList = [];
 
 			var lines = content.split(/\r\n|\n/);

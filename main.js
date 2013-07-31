@@ -17,7 +17,7 @@ var TASK_MAP = {
 };
 
 Optimist.usage([
-	'Usage: tpm [COMMAND] --config=[CONFIG_FILE]\n\n',
+	'Usage: ytpm [COMMAND] --config=[CONFIG_FILE]\n\n',
 	'Examples:\n',
 	'tpm src/js/g.js\n',
 	'tpm src/css/g.less\n',

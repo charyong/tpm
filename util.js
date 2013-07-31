@@ -248,7 +248,7 @@ function newMail(to, subject, body, callback) {
 		error('[MAILTO] ' + stderr);
 	});
 
-	mailProcess.on('exit', function() {
+	mailProcess.on('close', function() {
 		callback && callback();
 	});
 }
