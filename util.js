@@ -4,12 +4,9 @@ var Fs = require('fs');
 var util = require('util');
 var Iconv = require('iconv-lite');
 var _ = require('underscore');
-var UglifyJs = require('uglify-js');
+var UglifyJS = require('uglify-js');
 var CleanCss = require('clean-css');
 var ChildProcess = require('child_process');
-
-var uglifyParser = UglifyJs.parser;
-var uglifyPro = UglifyJs.uglify;
 
 var linefeed = process.platform === 'win32' ? '\r\n' : '\n';
 
@@ -123,10 +120,16 @@ function minJs(fromPath, toPath, charset) {
 
 	var content = readFileSync(fromPath, charset);
 
-	var ast = uglifyParser.parse(content); // parse code and get the initial AST
-	ast = uglifyPro.ast_mangle(ast);
-	ast = uglifyPro.ast_squeeze(ast);
-	var minContent = uglifyPro.gen_code(ast) + ';'; // compressed code
+	var result = UglifyJS.minify(content, {
+		fromString : true,
+		compress : {
+			hoist_funs : false,
+			join_vars : false,
+			loops : false,
+			unused : false
+		}
+	});
+	var minContent = result.code + ';';
 
 	writeFileSync(toPath, banner + minContent);
 
