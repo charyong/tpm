@@ -4,6 +4,7 @@ var Fs = require('fs');
 var Rimraf = require('rimraf');
 var Iconv = require('iconv-lite');
 var ChildProcess = require('child_process');
+var Request = require('request');
 
 var Util = require(__dirname + '/../util');
 
@@ -60,10 +61,43 @@ function openEmail(config, projectName, paths, callback) {
 
 exports.run = function(args, config) {
 
+	// 转换成相对路径
+	function getRelativePath(path) {
+		var dirPath = Path.resolve(config.root);
+		return Path.relative(dirPath, path).split(Path.sep).join('/');
+	}
+
 	var distDirPath = Path.resolve(config.root + '/dist');
 
 	if (args.length < 1) {
 		console.log(DIFF_USAGE);
+		return;
+	}
+
+	// 列出未上线的所有图片文件
+	if (args[0] == 'img') {
+		var imgList = Util.grepPaths(distDirPath + '/img', function(path) {
+			return /\.(jpg|png|gif|ico|swf)$/.test(path);
+		});
+		var pathCount = imgList.length;
+		var pathList = [];
+		imgList.forEach(function(path) {
+			var url = 'http://css.tudouui.com/v3/' + getRelativePath(path);
+			Request(url, function (error, response, body) {
+				pathCount--;
+				if (response.statusCode == 404) {
+					pathList.push(path);
+					Util.warn('[GET] ' + url + ' [' + response.statusCode + '] ' + pathCount);
+				} else {
+					Util.info('[GET] ' + url + ' [' + response.statusCode + '] ' + pathCount);
+				}
+				if (pathCount === 0) {
+					setTimeout(function() {
+						openEmail(config, '', pathList);
+					}, 0);
+				}
+			});
+		});
 		return;
 	}
 
