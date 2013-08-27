@@ -302,7 +302,7 @@ function grepDepList(path, root, recursion) {
 
 	var depMap = {};
 
-	function walk(path, isMain) {
+	function walk(path, isMain, recursion) {
 		var fileStr = readFileSync(path, 'utf8');
 
 		if (isMain) {
@@ -338,7 +338,10 @@ function grepDepList(path, root, recursion) {
 					if (typeof depMap[id] == 'undefined') {
 						depMap[id] = true;
 						if (recursion) {
-							walk(filePath, false);
+							// lazy module
+							walk(filePath, true, false);
+							// normal module
+							walk(filePath, false, true);
 						}
 					}
 				}
@@ -346,7 +349,7 @@ function grepDepList(path, root, recursion) {
 		}
 	}
 
-	walk(path, true);
+	walk(path, true, recursion);
 
 	return Object.keys(depMap);
 }
