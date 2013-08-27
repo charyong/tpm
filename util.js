@@ -123,10 +123,20 @@ function minJs(fromPath, toPath, charset) {
 	var result = UglifyJS.minify(content, {
 		fromString : true,
 		compress : {
-			hoist_funs : false,
-			join_vars : false,
+			sequences : false,
+			properties : false,
+			dead_code : false,
+			conditionals : false,
+			comparisons : false,
+			evaluate : false,
+			booleans : false,
 			loops : false,
-			unused : false
+			unused : false,
+			hoist_funs : false,
+			hoist_vars : false,
+			if_return : false,
+			join_vars : false,
+			cascade : false,
 		}
 	});
 	var minContent = result.code + ';';
