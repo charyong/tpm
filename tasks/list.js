@@ -76,13 +76,14 @@ exports.run = function(args, config) {
 
 	// 列出未上线的所有图片文件
 	if (args[0] == 'img') {
+		var env = args[1] || '';
 		var imgList = Util.grepPaths(distDirPath + '/img', function(path) {
 			return /\.(jpg|png|gif|ico|swf)$/.test(path);
 		});
 		var pathCount = imgList.length;
 		var pathList = [];
 		imgList.forEach(function(path) {
-			var url = 'http://css.tudouui.com/v3/' + getRelativePath(path);
+			var url = 'http://css' + env + '.tudouui.com/v3/' + getRelativePath(path);
 			Request(url, function (error, response, body) {
 				pathCount--;
 				if (response.statusCode == 404) {

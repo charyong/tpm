@@ -1,6 +1,6 @@
 {
 	"name": "tpm",
-	"version": "1.0.25",
+	"version": "1.0.26",
 	"description": "Static Package Manager",
 	"author": "Longhao Luo <lhluo@tudou.com>",
 	"license": "GPL",
