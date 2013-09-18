@@ -40,7 +40,9 @@ function openEmail(config, projectName, paths, callback) {
 			if ((match = /<commit\s+revision="(\d+)">/i.exec(data))) {
 				line += ' ' + match[1];
 			}
-			contentList.push(line);
+			if (line) {
+				contentList.push(line);
+			}
 			pathCount--;
 			if (pathCount === 0) {
 				var subject = '版本发布' + (projectName !== '' ? (' - ' + projectName) : '');
@@ -54,7 +56,7 @@ function openEmail(config, projectName, paths, callback) {
 
 		cp.stderr.on('data', function(stderr){
 			pathCount--;
-			Util.error('[SVN] ' + stderr);
+			Util.error('[SVN] get info failed, please commit "' + path + '"');
 		});
 	});
 }
@@ -67,22 +69,11 @@ exports.run = function(args, config) {
 		return Path.relative(dirPath, path).split(Path.sep).join('/');
 	}
 
-	var distDirPath = Path.resolve(config.root + '/dist');
-
-	if (args.length < 1) {
-		console.log(DIFF_USAGE);
-		return;
-	}
-
-	// 列出未上线的所有图片文件
-	if (args[0] == 'img') {
-		var env = args[1] || '';
-		var imgList = Util.grepPaths(distDirPath + '/img', function(path) {
-			return /\.(jpg|png|gif|ico|swf)$/.test(path);
-		});
-		var pathCount = imgList.length;
+	// 列出未上线的文件
+	function listNoDeployedFiles(fileList, env) {
+		var pathCount = fileList.length;
 		var pathList = [];
-		imgList.forEach(function(path) {
+		fileList.forEach(function(path) {
 			var url = 'http://css' + env + '.tudouui.com/v3/' + getRelativePath(path);
 			Request(url, function (error, response, body) {
 				pathCount--;
@@ -99,6 +90,12 @@ exports.run = function(args, config) {
 				}
 			});
 		});
+	}
+
+	var distDirPath = Path.resolve(config.root + '/dist');
+
+	if (args.length < 1) {
+		console.log(DIFF_USAGE);
 		return;
 	}
 
@@ -144,11 +141,61 @@ exports.run = function(args, config) {
 	}
 
 	// 根据项目文件输出列表
-	var path = args[0];
+	if (Util.indir(args[0], config.root + '/project')) {
+		var projectPath = args[0];
 
-	var pathList = Util.readProjectFile(config, path, 'dist');
+		var pathList = Util.readProjectFile(config, projectPath, 'dist');
 
-	var basename = Path.basename(path, '.txt');
+		var basename = Path.basename(projectPath, '.txt');
 
-	openEmail(config, basename, pathList);
+		openEmail(config, basename, pathList);
+		return;
+	}
+
+	// 根据CSS文件，列出未上线的所有图片文件
+	if (Util.indir(args[0], config.root + '/dist/css')) {
+		var cssPath = args[0];
+		var env = args[1] || '';
+		var dirPath = Path.dirname(cssPath);
+
+		function url2path(url) {
+			var path = '';
+			if (url.charAt(0) == '.') {
+				path = Path.resolve(dirPath + '/' + url);
+			} else if (url.charAt(0) == '/') {
+				path = Path.resolve(config.root + '/../' + url);
+			}
+			return path;
+		}
+
+		var content = Util.readFileSync(cssPath, 'utf-8');
+		content = content.replace(/\/\*[\S\s]*?\*\//g, '');
+
+		var match;
+		var regExp = /url\("?((?:\\"|[^"\)])+)"?\)/g;
+		var pathList = [];
+		while((match = regExp.exec(content))) {
+			var url = match[1];
+			var path = url2path(url);
+			if (path) {
+				pathList.push(path);
+			}
+		}
+
+		listNoDeployedFiles(pathList, env);
+		return;
+	}
+
+	// 直接指定路径，列出所有未上线的文件
+	if (Util.indir(args[0], config.root + '/dist')) {
+		var dirPath = args[0];
+		var env = args[1] || '';
+
+		var pathList = Util.grepPaths(dirPath, function(path) {
+			return /\.(jpg|png|gif|ico|swf|swz|eot|svg|ttf|woff)$/i.test(path);
+		});
+
+		listNoDeployedFiles(pathList, env);
+	}
+
 };
