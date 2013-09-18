@@ -227,6 +227,12 @@ exports.run = function(args, config) {
 		Ozma()(options, function(buildPath, distPath) {
 			Util.setSvnKeywords(buildPath);
 			Util.setSvnKeywords(distPath);
+
+			// 检测测试用alert
+			var match = /\balert\(\d+\)/.exec(Util.readFileSync(buildPath, 'utf-8'));
+			if (match) {
+				Util.error('[ERROR] detected debug code "' + match[0] + '" at "' + buildPath + '"');
+			}
 		});
 	}
 
