@@ -79,9 +79,9 @@ exports.run = function(args, config) {
 				if ((match = /<commit\s+revision="(\d+)">/i.exec(data))) {
 					var value = match[1];
 				}
-				if (value) {
-					result[path] = value;
-				}
+
+				result[path] = value;
+
 				pathCount--;
 				if (pathCount === 0) {
 					setTimeout(function(){
@@ -91,10 +91,24 @@ exports.run = function(args, config) {
 			});
 
 			cp.stderr.on('data', function(stderr){
+				result[path] = null;
+
 				pathCount--;
-				Util.error('[SVN] ' + stderr);
+				Util.error('[SVN] get info failed, please commit "' + path + '"');
 			});
 		});
+	}
+
+	// 优化图片
+	function optimizeImg(distPath) {
+		// 在Windows下优化PNG
+		if (process.platform === 'win32' && /\.png$/i.test(distPath)) {
+			var cmd = '"' + Path.resolve(__dirname + '/../bin/PngOptimizerCL').replace(/\\/g, '\\\\') + '" -file:"' + distPath.replace(/\\/g, '\\\\') + '"';
+
+			console.log(cmd);
+
+			ChildProcess.exec(cmd);
+		}
 	}
 
 	// 图片版本化
@@ -141,8 +155,13 @@ exports.run = function(args, config) {
 			});
 
 			_.each(data, function(version, path) {
-				var buildPath = addVersion(getBuildPath(path), version);
-				var distPath = addVersion(getDistPath(path), version);
+				var buildPath = getBuildPath(path);
+				var distPath = getDistPath(path);
+
+				if (version) {
+					buildPath = addVersion(buildPath, version);
+					distPath = addVersion(distPath, version);
+				}
 
 				if (!Fs.existsSync(buildPath) || Util.mtime(path) >= Util.mtime(buildPath)) {
 					Util.copyFile(path, buildPath);
@@ -150,15 +169,7 @@ exports.run = function(args, config) {
 
 				if (!Fs.existsSync(distPath) || Util.mtime(path) >= Util.mtime(distPath)) {
 					Util.copyFile(path, distPath);
-
-					// 在Windows下优化PNG
-					if (process.platform === 'win32' && /\.png$/i.test(distPath)) {
-						var cmd = '"' + Path.resolve(__dirname + '/../bin/PngOptimizerCL').replace(/\\/g, '\\\\') + '" -file:"' + distPath.replace(/\\/g, '\\\\') + '"';
-
-						console.log(cmd);
-
-						var cp = ChildProcess.exec(cmd);
-					}
+					optimizeImg(distPath);
 				}
 			});
 
@@ -252,6 +263,8 @@ exports.run = function(args, config) {
 
 		Util.copyFile(path, buildPath);
 		Util.copyFile(path, distPath);
+
+		optimizeImg(distPath);
 	}
 
 	// 根据一个项目
