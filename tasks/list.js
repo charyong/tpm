@@ -106,7 +106,7 @@ exports.run = function(args, config) {
 	if (/^\d+$/.test(args[0])) {
 		var revision = args[0];
 
-		var cmd = 'svn diff -r' + revision + ':HEAD --summarize --no-diff-deleted "' + distDirPath.replace(/\\/g, '\\\\') + '"';
+		var cmd = 'svn diff -r' + (revision - 1) + ':HEAD --summarize --no-diff-deleted "' + distDirPath.replace(/\\/g, '\\\\') + '"';
 
 		console.log(cmd);
 
