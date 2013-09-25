@@ -159,6 +159,7 @@ exports.run = function(args, config) {
 		var dirPath = Path.dirname(cssPath);
 
 		function url2path(url) {
+			url = url.replace(/[?#].*$/, '');
 			var path = '';
 			if (url.charAt(0) == '.') {
 				path = Path.resolve(dirPath + '/' + url);
