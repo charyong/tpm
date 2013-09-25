@@ -1,0 +1,17 @@
+#######################################################################
+#
+# TPM 变更记录
+#
+#######################################################################
+
+ver 1.1.1
+* Bugfix：图片URL包含?或#字符时打包LESS报错。
+
+ver 1.1.0
+* 改善：升级ozma，不再依赖Python和VC++。
+* 改善：直接复制图片时优化PNG。比如，执行ytpm src/img/xx.png 时
+* 改善：构建LESS，图片没有提交的时候也会复制图片。之前版本是直接报错，不会copy到dist目录下。
+* 改善：ytpm list [SVN版本号] 命令的版本号自动减一。
+* 添加：ytpm list [CSS dist路径]，根据CSS文件，列出所有未上线的图片文件。例：ytpm list dist/css/home/main.css
+* 添加：ytpm list [图片目录dist路径]，遍历指定目录，列出所有未上线的图片文件。例：ytpm list dist/img/home
+* 删除：ytpm list img命令，可以用ytpm list dist/img命令代替。
