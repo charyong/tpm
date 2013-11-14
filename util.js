@@ -190,6 +190,14 @@ function setSvnKeywords(path) {
 	ChildProcess.exec(cmd);
 }
 
+function setSvnAdd(path) {
+	var cmd = 'svn add "' + path.replace(/\\/g, '\\\\') + '"';
+
+	console.log(cmd);
+
+	ChildProcess.exec(cmd);
+}
+
 // @param type: "src", "build", "dist"
 function readProjectFile(config, path, type) {
 	var content = Fs.readFileSync(path, 'utf-8');
@@ -388,6 +396,7 @@ exports.minJs = minJs;
 exports.minCss = minCss;
 exports.concatFile = concatFile;
 exports.setSvnKeywords = setSvnKeywords;
+exports.setSvnAdd = setSvnAdd;
 exports.readProjectFile = readProjectFile;
 exports.newMail = newMail;
 exports.grepPaths = grepPaths;

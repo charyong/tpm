@@ -50,7 +50,10 @@ function openEmail(config, projectName, paths, callback) {
 
 				console.log(content);
 
-				Util.newMail(config.deploy_mail, subject, content, callback);
+				if(config.useClientMail !== false){
+					Util.newMail(config.deploy_mail, subject, content, callback);
+				}
+
 			}
 		});
 

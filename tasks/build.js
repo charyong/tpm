@@ -166,11 +166,17 @@ exports.run = function(args, config) {
 
 				if (!Fs.existsSync(buildPath) || Util.mtime(path) >= Util.mtime(buildPath)) {
 					Util.copyFile(path, buildPath);
+					if(config.autoSvnAdd === true){
+						Util.setSvnAdd(buildPath);
+					}
 				}
 
 				if (!Fs.existsSync(distPath) || Util.mtime(path) >= Util.mtime(distPath)) {
 					Util.copyFile(path, distPath);
 					optimizeImg(distPath);
+					if(config.autoSvnAdd === true){
+						Util.setSvnAdd(distPath);
+					}
 				}
 			});
 
