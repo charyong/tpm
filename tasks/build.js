@@ -85,7 +85,7 @@ exports.run = function(args, config) {
 				if (pathCount === 0) {
 					setTimeout(function(){
 						callback(result);
-					}, 0);
+					}, 10);
 				}
 			});
 
