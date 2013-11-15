@@ -7,6 +7,9 @@
 ver 1.1.2
 * 支持不调用本地email客户端软件，exports.useClientMail = false; // 是否使用系统自带email发邮件
 * 支持复制文件时执行svn add功能，exports.autoSvnAdd = true; // build、dist目录中新增文件时是否自动执行svn add
+* AMD模块支持不写ID。
+* require、define依赖、require.text路径支持相对路径。
+* 异步加载文件需要单独构建。
 
 ver 1.1.1
 * Bugfix：图片URL包含?或#字符时打包LESS报错。

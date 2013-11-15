@@ -305,18 +305,106 @@ function grepPaths(rootDirPath, checkFn) {
 	return paths;
 }
 
+// 将JS代码改成AMD模块，包含路径转换，补充模块ID，模板转换等
+function fixModule(path, str) {
+	var root = path.replace(/^(.*?)[\\\/](src|build|dist)[\\\/].*$/, '$1');
+	var relativePath = path.split(Path.sep).join('/').replace(/^.+\/src\/js\//, '');
+	var mid = relativePath.replace(/\.js$/, '');
+
+	function fixDep(s, format) {
+		if (format) {
+			s = s.replace(/\s/g, '');
+		}
+		return s.replace(/(['"])(.+?)\1(,?)/g, function($0, $1, $2, $3) {
+			var f = $2;
+			if(f.charAt(0) == '.') {
+				f = relativePath.replace(/[\w-]+\.js$/, '') + f;
+				f = f.replace(/\w+\/\.\.\//g, '').replace(/\.\//g, '');
+			}
+			else if(f.charAt(0) == '/') {
+				f = f.slice(1);
+			}
+			if (format) {
+				return '\n  "' + f + '"' + $3 + '\n';
+			} else {
+				return $1 + f + $1 + $3;
+			}
+		}).replace(/,\n\n/g, ',\n');
+	}
+
+	// 补充模块ID
+	if(/(?:^|[^\w\.])define\s*\(/.test(str) && !/(?:^|[^\w\.])define\s*\(\s*['"]/.test(str)) {
+		str = str.replace(/\b(define\s*\(\s*)/, '$1"' + mid + '", ');
+	}
+
+	// 补齐依赖
+	str = str.replace(/((?:^|[^\w\.])define\s*\(\s*['"].*?['"]\s*,\s*)([['"][\s\S]+?)(,\s*function\s*\()/g, function($0, $1, $2, $3) {
+		return $1 + fixDep($2, true) + $3;
+	});
+	str = str.replace(/((?:^|[^\w\.])require\s*\(\s*)([\['"][\s\S]+?)(,\s*function\s*\()/g, function($0, $1, $2, $3) {
+		return $1 + fixDep($2, false) + $3;
+	});
+	str = str.replace(/((?:^|[^\w\.])define\s*\(\s*['"].*?['"]\s*)(,\s*function\s*\()/g, '$1,[]$2');
+
+	// 非AMD模块
+	if(!/(?:^|[^\w\.])(define|require)\s*\(/.test(str)) {
+		return str += '\n/* autogeneration */\ndefine("' + mid + '", [], function(){});\n';
+	}
+
+	// JS模板转换
+	str = str.replace(/(\b)require\.text\(\s*(['"])(.+?)\2\s*\)/g, function($0, $1, $2, $3) {
+		var f = $3;
+		if(/^[a-z_/]/i.test(f)) {
+			f = root + '/src/js/' + f;
+		}
+		else {
+			f = path.replace(/[\w-]+\.js$/, '') + f;
+			f = f.replace(/\w+\/\.\.\//g, '').replace(/\.\//g, '');
+		}
+		var s = '';
+		try {
+			s = Fs.readFileSync(f, {
+				encoding: 'utf-8'
+			});
+
+		} catch(e) {
+			console.error(e);
+			s = e.toString();
+		}
+		s = s.replace(/^\uFEFF/, '');
+		s = s.replace(/(\r\n|\r|\n)\s*/g, ' ');
+		s = s.replace(/\\/g, '\\\\');
+		s = s.replace(/'/g, "\\'");
+		return $1 + "'" + s + "'";
+	});
+
+	return str;
+}
+
+// Remove comments, simple version
+function removeComments(str) {
+	return str.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '');
+}
+
 // Grep dependencies for AMD module
 function grepDepList(path, root, recursion) {
 
 	var depMap = {};
+	var depList = [];
+	var fileCache = {};
 
 	function walk(path, isMain, recursion) {
-		var fileStr = readFileSync(path, 'utf8');
+		var fileStr = fileCache[path];
+		if (!fileStr) {
+			fileStr = readFileSync(path, 'utf8');
+			fileStr = fixModule(path, fileStr);
+			fileCache[path] = fileStr;
+		}
 
 		if (isMain) {
-			var regExp = /(?:^|[^\w\.])require\(\s*(?:\[([^\]]*)\]|'([^']*)'|"([^"]*)")/g;
+			var regExp = /(?:^|[^\w\.])require\s*\(\s*(?:\[([^\]]*)\]|'([^']*)'|"([^"]*)")/g;
 		} else {
-			var regExp = /(?:^|[^\w\.])define\(\s*(?:(?:'[^']*'|"[^"]*")\s*,)?\s*(?:\[([^\]]*)\]|'([^']*)'|"([^"]*)")/g;
+			var regExp = /(?:^|[^\w\.])define\s*\(\s*['"].*?['"]\s*,\s*(?:\[([^\]]*)\]|'([^']*)'|"([^"]*)")/g;
 		}
 
 		var match;
@@ -325,7 +413,8 @@ function grepDepList(path, root, recursion) {
 			var depIds = [];
 
 			if (match[1]) {
-				depIds = match[1].split(',').map(function(val) {
+				depStr = removeComments(match[1]);
+				depIds = depStr.split(',').map(function(val) {
 					val = val.trim();
 					return val.substr(1, val.length - 2);
 				});
@@ -333,7 +422,7 @@ function grepDepList(path, root, recursion) {
 				depIds = [match[3] || match[2]];
 			}
 
-			depIds.forEach(function(id) {
+			depIds.reverse().forEach(function(id) {
 				if (id) {
 					if (id.charAt(0) === '.') {
 						var filePath = Path.resolve(Path.dirname(path), id + '.js');
@@ -351,15 +440,19 @@ function grepDepList(path, root, recursion) {
 							// normal module
 							walk(filePath, false, true);
 						}
+						depList.push(id);
 					}
 				}
 			});
 		}
+
+		return fileStr;
 	}
 
 	walk(path, true, recursion);
+	walk(path, false, recursion);
 
-	return Object.keys(depMap);
+	return depList;
 }
 
 // Grep module ID list
@@ -377,6 +470,57 @@ function grepModuleList(path) {
 	}
 
 	return Object.keys(idMap);
+}
+
+// Build JS (AMD)
+function buildJs(path, ignore) {
+	ignore = ignore || [];
+
+	var root = path.replace(/^(.*?)[\\\/](src|build|dist)[\\\/].*$/, '$1');
+	var jsDirPath = root + '/src/js';
+	var relativePath = path.split(Path.sep).join('/').replace(/^.+\/src\/js\//, '');
+	var mid = relativePath.replace(/\.js/, '');
+	var isLazy = /^lazy\//.test(mid);
+
+	var ignoreMap = {};
+	ignore.forEach(function(id) {
+		ignoreMap[id] = true;
+	});
+
+	var depList = grepDepList(path, jsDirPath, true);
+
+	var content = banner;
+
+	if (!isLazy) {
+		content += '\nrequire.config({ enable_ozma: true });\n\n\n';
+	}
+
+	depList.forEach(function(dep) {
+		if (ignoreMap[dep]) {
+			return;
+		}
+		var filePath = jsDirPath + '/' + dep + '.js';
+		if (mid == dep) {
+			return;
+		}
+		info('import: ' + dep);
+		content += '/* @source ' + dep + '.js */;\n';
+		var str = readFileSync(filePath, 'utf-8');
+		str = fixModule(filePath, str);
+		content += '\n' + str  + '\n';
+	});
+
+	if (isLazy) {
+		content += '/* @source ' + mid + '.js */;\n';
+	} else {
+		content += '/* @source  */;\n';
+	}
+
+	var str = readFileSync(path, 'utf-8');
+	str = fixModule(path, str);
+	content += '\n' + str;
+
+	return content;
 }
 
 exports.linefeed = linefeed;
@@ -400,5 +544,7 @@ exports.setSvnAdd = setSvnAdd;
 exports.readProjectFile = readProjectFile;
 exports.newMail = newMail;
 exports.grepPaths = grepPaths;
+exports.fixModule = fixModule;
 exports.grepDepList = grepDepList;
 exports.grepModuleList = grepModuleList;
+exports.buildJs = buildJs;

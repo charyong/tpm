@@ -2,7 +2,6 @@ var Path = require('path');
 var Fs = require('fs');
 var Iconv = require('iconv-lite');
 var _ = require('underscore');
-var Ozma = require('ozma-tudou').Ozma;
 var Less = require('less');
 var ChildProcess = require('child_process');
 
@@ -190,11 +189,6 @@ exports.run = function(args, config) {
 		var buildPath = getBuildPath(path);
 		var distPath = getDistPath(path);
 
-		// 延迟加载JS不能单独构建
-		if (/^lazy\//.test(relativePath)) {
-			return;
-		}
-
 		// 把多个文件合并成一个文件
 		if (config.libjs[relativePath]) {
 			var fromPaths = config.libjs[relativePath].map(function(val) {
@@ -209,38 +203,29 @@ exports.run = function(args, config) {
 		}
 
 		// AMD文件
-		var options = {
-			src : path,
-			saveConfig : false,
-			config : {
-				baseUrl : config.root + '/src/js/',
-				distUrl : config.root + '/build/js/',
-				disableAutoSuffix : true,
-			},
-		};
-
 		var relativePath = getRelativePath(path, 'js');
 
 		if (config.globaljs.indexOf(relativePath) < 0) {
 			if (/^(module|page|lazy)\/mobile\//.test(relativePath)) {
-				options.config.ignore = config.mobileIgnore;
+				var ignore = config.mobileIgnore;
 			} else {
-				options.config.ignore = config.ignore;
+				var ignore = config.ignore;
 			}
+		} else {
+			var ignore = [];
 		}
 
-		options._ = [path];
-
-		Ozma()(options, function(buildPath, distPath) {
-			Util.setSvnKeywords(buildPath);
-			Util.setSvnKeywords(distPath);
-
-			// 检测测试用alert
-			var match = /\balert\(\d+\)/.exec(Util.readFileSync(buildPath, 'utf-8'));
-			if (match) {
-				Util.error('[ERROR] detected debug code "' + match[0] + '" at "' + buildPath + '"');
+		config.main.js.forEach(function(path) {
+			if (/^lazy\//.test(path)) {
+				ignore.push(path.replace(/\.js$/, ''));
 			}
 		});
+
+		var content = Util.buildJs(path, ignore);
+		Util.writeFileSync(buildPath, content);
+		Util.minJs(buildPath, distPath);
+		Util.setSvnKeywords(buildPath);
+		Util.setSvnKeywords(distPath);
 	}
 
 	// 构建一个LESS文件
