@@ -311,6 +311,18 @@ function fixModule(path, str) {
 	var relativePath = path.split(Path.sep).join('/').replace(/^.+\/src\/js\//, '');
 	var mid = relativePath.replace(/\.js$/, '');
 
+	function resolveUrl(url) {
+		while(true) {
+			url = url.replace(/\w+\/\.\.\//g, '');
+			console.log(url)
+			if (!/\.\.\//.test(url)) {
+				break;
+			}
+		}
+		url = url.replace(/\.\//g, '');
+		return url;
+	}
+
 	function fixDep(s, format) {
 		if (format) {
 			s = s.replace(/\s/g, '');
@@ -319,7 +331,7 @@ function fixModule(path, str) {
 			var f = $2;
 			if(f.charAt(0) == '.') {
 				f = relativePath.replace(/[\w-]+\.js$/, '') + f;
-				f = f.replace(/\w+\/\.\.\//g, '').replace(/\.\//g, '');
+				f = resolveUrl(f);
 			}
 			else if(f.charAt(0) == '/') {
 				f = f.slice(1);
@@ -359,7 +371,7 @@ function fixModule(path, str) {
 		}
 		else {
 			f = path.replace(/[\w-]+\.js$/, '') + f;
-			f = f.replace(/\w+\/\.\.\//g, '').replace(/\.\//g, '');
+			f = resolveUrl(f);
 		}
 		var s = '';
 		try {
