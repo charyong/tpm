@@ -372,7 +372,7 @@ function fixModule(path, str) {
 			f = path.replace(/[\w-]+\.js$/, '') + f;
 			f = resolveUrl(f);
 		}
-		var s = Util.readFileSync(f, 'utf-8');
+		var s = readFileSync(f, 'utf-8');
 		s = s.replace(/^\uFEFF/, '');
 		s = s.replace(/(\r\n|\r|\n)\s*/g, ' ');
 		s = s.replace(/\\/g, '\\\\');
