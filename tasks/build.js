@@ -131,19 +131,19 @@ exports.run = function(args, config) {
 		}
 
 		var match;
-		var regExp = /url\("?((?:\\"|[^"\)])+)"?\)/g;
+		var regExp = /url\(["']?([^'"\)]+)["']?\)/g;
 		var newContent = content.replace(/\/\*[\S\s]*?\*\//g, '');
 		var pathList = [];
 		while((match = regExp.exec(newContent))) {
 			var url = match[1];
 			var path = url2path(url);
-			if (path) {
+			if (path && Util.indir(path, Path.resolve(config.root))) {
 				pathList.push(path);
 			}
 		}
 
 		getSvnVersion(pathList, function(data) {
-			content = content.replace(/\/\*[\S\s]*?\*\/|(url\("?)((?:\\"|[^"\)])+)("?\))/g, function(full, prefix, url, suffix) {
+			content = content.replace(/\/\*[\S\s]*?\*\/|(url\(["']?)([^'"\)]+)(["']?\))/g, function(full, prefix, url, suffix) {
 				if (prefix) {
 					var path = url2path(url);
 					if (path && data[path]) {
