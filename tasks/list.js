@@ -176,7 +176,7 @@ exports.run = function(args, config) {
 		content = content.replace(/\/\*[\S\s]*?\*\//g, '');
 
 		var match;
-		var regExp = /url\("?((?:\\"|[^"\)])+)"?\)/g;
+		var regExp = /url\(["']?([^'"\)]+)["']?\)/g;
 		var pathList = [];
 		while((match = regExp.exec(content))) {
 			var url = match[1];
