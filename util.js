@@ -374,8 +374,8 @@ function fixModule(path, str) {
 		}
 		var s = readFileSync(f, 'utf-8');
 		s = s.replace(/^\uFEFF/, '');
-		s = s.replace(/(\r\n|\r|\n)\s*/g, '\\n');
 		s = s.replace(/\\/g, '\\\\');
+		s = s.replace(/(\r\n|\r|\n)\s*/g, '\\n');
 		s = s.replace(/'/g, "\\'");
 		return $1 + "'" + s + "'";
 	});
