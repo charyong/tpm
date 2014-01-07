@@ -372,7 +372,7 @@ function replaceTemplate(path, str) {
 	var root = path.replace(/^(.*?)[\\\/](src|build|dist)[\\\/].*$/, '$1');
 	// sub template
 	function replaceSubTemplate(parentPath, str) {
-		info('import template: ' + parentPath);
+		info('import: ' + Path.relative(root + '/src/js', parentPath).split(Path.sep).join('/'));
 		return str.replace(/<%\s*require\.text\(\s*(['"])(.+?)\1\s*\);?\s*%>/g, function($0, $1, $2) {
 			var f = $2;
 			if(/^[a-z_/]/i.test(f)) {
@@ -537,6 +537,7 @@ function buildJs(path, ignore) {
 		content += '/* @source ' + dep + '.js */;\n';
 		var str = readFileSync(filePath, 'utf-8');
 		str = fixModule(filePath, str);
+		str = replaceTemplate(filePath, str);
 		content += '\n' + str  + '\n';
 	});
 
