@@ -207,9 +207,9 @@ exports.run = function(args, config) {
 
 		if (config.globaljs.indexOf(relativePath) < 0) {
 			if (/^(module|page|lazy)\/mobile\//.test(relativePath)) {
-				var ignore = config.mobileIgnore;
+				var ignore = config.mobileIgnore || [];
 			} else {
-				var ignore = config.ignore;
+				var ignore = config.ignore || [];
 			}
 		} else {
 			var ignore = [];
@@ -317,8 +317,12 @@ exports.run = function(args, config) {
 
 		// grep ignore module
 		var jsDirPath = config.root + '/src/js';
-		config.ignore = Util.grepDepList(jsDirPath + '/g.js', jsDirPath, true);
-		config.mobileIgnore = Util.grepDepList(jsDirPath + '/m.js', jsDirPath, true);
+		if (Fs.existsSync(jsDirPath + '/g.js')) {
+			config.ignore = Util.grepDepList(jsDirPath + '/g.js', jsDirPath, true);
+		}
+		if (Fs.existsSync(jsDirPath + '/m.js')) {
+			config.mobileIgnore = Util.grepDepList(jsDirPath + '/m.js', jsDirPath, true);
+		}
 
 		buildFiles(pathList);
 	}

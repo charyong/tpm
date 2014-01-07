@@ -5,22 +5,6 @@ exports.jira_host = 'http://jira.intra.tudou.com';
 
 exports.deploy_mail = 'webtest_fabu@tudou.com';
 
-exports.ignore = [
-	"g",
-	"tui/browser",
-	"tui/util",
-	"tui/class",
-	"tui/event",
-	"tui/cookie",
-	"tui/storage",
-	"tui/net",
-	"tui/template",
-	"tui/drag",
-	"tui/mask",
-	"tui/widget",
-	"tui/dialog"
-];
-
 exports.main = {
 	"js" : [
 		"lib.js",

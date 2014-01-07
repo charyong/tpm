@@ -886,8 +886,8 @@ define('tui/cookie', [], function() {
 
 
 define('g', [
-	'tui/cookie',
-	'tui/dialog'
+  "tui/cookie",
+  "tui/dialog"
 ], function(Cookie, Dialog, require, exports) {
 
 	exports.init = function() {

@@ -305,22 +305,24 @@ function grepPaths(rootDirPath, checkFn) {
 	return paths;
 }
 
+function resolveUrl(url) {
+	while(true) {
+		url = url.replace(/\w+\/\.\.\//g, '');
+		if (!/\.\.\//.test(url)) {
+			break;
+		}
+	}
+	url = url.replace(/\.\//g, '');
+	return url;
+}
+
 // 将JS代码改成AMD模块，包含路径转换，补充模块ID，模板转换等
 function fixModule(path, str) {
 	var root = path.replace(/^(.*?)[\\\/](src|build|dist)[\\\/].*$/, '$1');
 	var relativePath = path.split(Path.sep).join('/').replace(/^.+\/src\/js\//, '');
 	var mid = relativePath.replace(/\.js$/, '');
 
-	function resolveUrl(url) {
-		while(true) {
-			url = url.replace(/\w+\/\.\.\//g, '');
-			if (!/\.\.\//.test(url)) {
-				break;
-			}
-		}
-		url = url.replace(/\.\//g, '');
-		return url;
-	}
+
 
 	function fixDep(s, format) {
 		if (format) {
@@ -362,17 +364,43 @@ function fixModule(path, str) {
 		return str += '\n/* autogeneration */\ndefine("' + mid + '", [], function(){});\n';
 	}
 
-	// JS模板转换
+	return str;
+}
+
+// Replace require.text to string
+function replaceTemplate(path, str) {
+	var root = path.replace(/^(.*?)[\\\/](src|build|dist)[\\\/].*$/, '$1');
+	// sub template
+	function replaceSubTemplate(parentPath, str) {
+		info('import template: ' + parentPath);
+		return str.replace(/<%\s*require\.text\(\s*(['"])(.+?)\1\s*\);?\s*%>/g, function($0, $1, $2) {
+			var f = $2;
+			if(/^[a-z_/]/i.test(f)) {
+				f = root + '/src/js/' + f;
+			}
+			else {
+				f = parentPath.replace(/[\w-]+\.\w+$/, '') + f;
+				f = resolveUrl(f);
+			}
+			var s = readFileSync(f, 'utf-8');
+			s = replaceSubTemplate(f, s);
+			s = s.replace(/^\uFEFF/, '');
+			return s;
+		});
+	}
+
+	// replace template string
 	str = str.replace(/(\b)require\.text\(\s*(['"])(.+?)\2\s*\)/g, function($0, $1, $2, $3) {
 		var f = $3;
 		if(/^[a-z_/]/i.test(f)) {
 			f = root + '/src/js/' + f;
 		}
 		else {
-			f = path.replace(/[\w-]+\.js$/, '') + f;
+			f = path.replace(/[\w-]+\.\w+$/, '') + f;
 			f = resolveUrl(f);
 		}
 		var s = readFileSync(f, 'utf-8');
+		s = replaceSubTemplate(f, s);
 		s = s.replace(/^\uFEFF/, '');
 		s = s.replace(/\\/g, '\\\\');
 		s = s.replace(/(\r\n|\r|\n)\s*/g, '\\n');
@@ -520,6 +548,7 @@ function buildJs(path, ignore) {
 
 	var str = readFileSync(path, 'utf-8');
 	str = fixModule(path, str);
+	str = replaceTemplate(path, str);
 	content += '\n' + str;
 
 	return content;

@@ -2,4 +2,4 @@
  * @modified $Author$
  * @version $Rev$
  */
-define("lazy/demo",["tui/cookie","tui/event"],function(e,t,n,r){r.init=function(){console.log("lazy/demo init")}});
+define("lazy/demo",["tui/cookie","tui/event"],function(i,n,o,e){e.init=function(){console.log("lazy/demo init")}});;

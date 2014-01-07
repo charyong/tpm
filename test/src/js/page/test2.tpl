@@ -1,0 +1,1 @@
+<%=row.nickname%>: <img src="#"/>
