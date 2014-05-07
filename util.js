@@ -191,11 +191,14 @@ function setSvnKeywords(path) {
 }
 
 function setSvnAdd(path) {
-	var cmd = 'svn add "' + path.replace(/\\/g, '\\\\') + '"';
+	if(!Array.isArray(path)){
+		path = [path];
+	}
 
-	console.log(cmd);
-
-	ChildProcess.exec(cmd);
+	var child = ChildProcess.spawn('svn', ['add'].concat(path));
+	child.stdout.on('data', function(data){
+		console.log('svn add:\n' + data);
+	});
 }
 
 // @param type: "src", "build", "dist"
