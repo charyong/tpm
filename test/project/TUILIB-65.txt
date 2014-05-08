@@ -1,3 +1,0 @@
-dist/js/lib.js
-dist/js/g.js
-dist/css/g.css
