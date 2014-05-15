@@ -7,24 +7,20 @@ var Util = require(__dirname + '/util');
 var TASK_MAP = {
 	build : true,
 	min : true,
-	deploy : true,
 	list : true,
 	cleanup : true,
 	check : true,
-	tui2build : true,
-	tui2min : true,
 	vm : true,
 };
 
 Optimist.usage([
 	'Usage: ytpm [COMMAND] --config=[CONFIG_FILE]\n\n',
 	'Examples:\n',
-	'tpm src/js/g.js\n',
-	'tpm src/css/g.less\n',
-	'tpm min build/js/g.js\n',
-	'tpm list 100\n',
-	'tpm deploy src/js/page/play wwwtest\n',
-	'tpm cleanup\n',
+	'ytpm src/js/g.js\n',
+	'ytpm src/css/g.less\n',
+	'ytpm min build/js/g.js\n',
+	'ytpm list 100\n',
+	'ytpm cleanup\n',
 ].join(''));
 
 var ARGV = Optimist.argv;

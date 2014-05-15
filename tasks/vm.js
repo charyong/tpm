@@ -5,9 +5,9 @@ var client = require('scp2');
 
 var Util = require(__dirname + '/../util');
 
-var DEPLOY_USAGE = 'Usage: tpm vm [vmPath] [ENV]\n\n' +
+var DEPLOY_USAGE = 'Usage: ytpm vm [vmPath] [ENV]\n\n' +
 	'Examples:\n' +
-	'tpm vm viewX.vm wwwtest\n';
+	'ytpm vm viewX.vm wwwtest\n';
 
 
 function connectManage3(sshConfig){
