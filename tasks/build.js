@@ -156,18 +156,18 @@ exports.run = function(args, config) {
 
 			var svnAddList = [];
 			_.each(data, function(version, path) {
-				var buildPath = getBuildPath(path);
+				//var buildPath = getBuildPath(path);
 				var distPath = getDistPath(path);
 
 				if (version) {
-					buildPath = addVersion(buildPath, version);
+					//buildPath = addVersion(buildPath, version);
 					distPath = addVersion(distPath, version);
 				}
 
-				if (!Fs.existsSync(buildPath) || Util.mtime(path) >= Util.mtime(buildPath)) {
-					Util.copyFile(path, buildPath);
-					svnAddList.push(buildPath);
-				}
+				//if (!Fs.existsSync(buildPath) || Util.mtime(path) >= Util.mtime(buildPath)) {
+				//	Util.copyFile(path, buildPath);
+				//	svnAddList.push(buildPath);
+				//}
 
 				if (!Fs.existsSync(distPath) || Util.mtime(path) >= Util.mtime(distPath)) {
 					Util.copyFile(path, distPath);
@@ -256,10 +256,10 @@ exports.run = function(args, config) {
 
 	// 构建一个图片文件
 	function buildImg(path) {
-		var buildPath = getBuildPath(path);
+		//var buildPath = getBuildPath(path);
 		var distPath = getDistPath(path);
 
-		Util.copyFile(path, buildPath);
+		//Util.copyFile(path, buildPath);
 		Util.copyFile(path, distPath);
 
 		optimizeImg(distPath);
