@@ -3,6 +3,8 @@ var Fs = require('fs');
 var Iconv = require('iconv-lite');
 var _ = require('underscore');
 var Less = require('less');
+var Imagemin = require('imagemin');
+var Pngcrush = require('imagemin-pngcrush');
 var ChildProcess = require('child_process');
 
 var Util = require(__dirname + '/../util');
@@ -40,7 +42,7 @@ exports.run = function(args, config) {
 
 	// 是否可构建的文件
 	function canBuild(path) {
-		if (!Util.indir(path, Path.resolve(config.root + '/src')) && !Util.indir(path, Path.resolve(config.root + '/project'))) {
+		if (!Util.indir(path, Path.resolve(config.root + '/src'))) {
 			return false;
 		}
 
@@ -54,7 +56,7 @@ exports.run = function(args, config) {
 			return config.main.css.indexOf(relativePath) >= 0;
 		}
 
-		return /\.(jpg|png|gif|ico|swf|htm|html|txt)$/.test(path);
+		return /\.[a-z]+$/.test(path);
 	}
 
 	// 取得文件SVN版本号
@@ -100,14 +102,31 @@ exports.run = function(args, config) {
 
 	// 优化图片
 	function optimizeImg(distPath) {
-		// 在Windows下优化PNG
-		if (process.platform === 'win32' && /\.png$/i.test(distPath)) {
-			var cmd = '"' + Path.resolve(__dirname + '/../bin/PngOptimizerCL').replace(/\\/g, '\\\\') + '" -file:"' + distPath.replace(/\\/g, '\\\\') + '"';
-
-			console.log(cmd);
-
-			ChildProcess.exec(cmd);
+		if (!/\.(png|jpg|jpeg|png|gif|svg)$/i.test(distPath)) {
+			return;
 		}
+
+		var srcContent = Util.readFileSync(distPath);
+
+		var imagemin = new Imagemin()
+			.src(srcContent)
+			.dest(distPath)
+			.use(Imagemin.gifsicle())
+			.use(Imagemin.jpegtran(true))
+			.use(Imagemin.optipng({ optimizationLevel: 3 }))
+			.use(Imagemin.svgo({plugins: [{removeViewBox: false}]}));
+
+		imagemin.optimize(function (err, data) {
+			if (err) {
+				Util.error('[imagemin] optimize failed, ' + err);
+				return;
+			}
+
+			var saved = srcContent.length - data.contents.length;
+			var savedMsg = saved > 0 ? 'saved ' + (Math.round(saved / 1024 * 100) / 100) + 'KB' : 'already optimized';
+
+			Util.info('[imagemin] ' + distPath + ' : ' + savedMsg);
+		});
 	}
 
 	// 图片版本化
@@ -156,18 +175,11 @@ exports.run = function(args, config) {
 
 			var svnAddList = [];
 			_.each(data, function(version, path) {
-				//var buildPath = getBuildPath(path);
 				var distPath = getDistPath(path);
 
 				if (version) {
-					//buildPath = addVersion(buildPath, version);
 					distPath = addVersion(distPath, version);
 				}
-
-				//if (!Fs.existsSync(buildPath) || Util.mtime(path) >= Util.mtime(buildPath)) {
-				//	Util.copyFile(path, buildPath);
-				//	svnAddList.push(buildPath);
-				//}
 
 				if (!Fs.existsSync(distPath) || Util.mtime(path) >= Util.mtime(distPath)) {
 					Util.copyFile(path, distPath);
@@ -256,20 +268,9 @@ exports.run = function(args, config) {
 
 	// 构建一个图片文件
 	function buildImg(path) {
-		//var buildPath = getBuildPath(path);
 		var distPath = getDistPath(path);
-
-		//Util.copyFile(path, buildPath);
 		Util.copyFile(path, distPath);
-
 		optimizeImg(distPath);
-	}
-
-	// 根据一个项目
-	function buildProject(path) {
-		var pathList = Util.readProjectFile(config, path, 'src');
-
-		buildFiles(pathList);
 	}
 
 	// 构建多个文件
@@ -280,12 +281,7 @@ exports.run = function(args, config) {
 			} else if (/\.less$/.test(path)) {
 				buildLess(path);
 			} else {
-				var projectPath = Path.resolve(config.root + '/project');
-				if (Util.indir(path, projectPath)) {
-					buildProject(path);
-				} else {
-					buildImg(path);
-				}
+				buildImg(path);
 			}
 		});
 	}

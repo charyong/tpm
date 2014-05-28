@@ -18,3 +18,4 @@ Thumbs.db
 .buildpath
 .settings
 .yml
+node_modules
