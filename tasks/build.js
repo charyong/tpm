@@ -4,7 +4,6 @@ var Iconv = require('iconv-lite');
 var _ = require('underscore');
 var Less = require('less');
 var Imagemin = require('imagemin');
-var Pngcrush = require('imagemin-pngcrush');
 var ChildProcess = require('child_process');
 
 var Util = require(__dirname + '/../util');
