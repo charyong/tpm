@@ -159,7 +159,10 @@ exports.run = function(args, config) {
 				pathList.push(path);
 			}
 		}
-
+		if (pathList.length < 1) {
+			callback(content);
+			return;
+		}
 		getSvnVersion(pathList, function(data) {
 			content = content.replace(/\/\*[\S\s]*?\*\/|(url\(["']?)([^'"\)]+)(["']?\))/g, function(full, prefix, url, suffix) {
 				if (prefix) {
@@ -252,10 +255,12 @@ exports.run = function(args, config) {
 		});
 
 		parser.parse(content, function(err, tree) {
+
 			if (err) {
 				return Util.error(err);
 			}
 			content = tree.toCSS();
+
 			renameAssets(path, content, function(content) {
 				Util.writeFileSync(buildPath, Util.banner + content);
 				Util.minCss(buildPath, distPath);
