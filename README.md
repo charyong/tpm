@@ -25,12 +25,10 @@ src/		# 源代码
 build/		# 打包后代码，未压缩
 	js/
 	css/
-	img/
 dist/		# 压缩后代码
 	js/
 	css/
 	img/
-project/	# 项目文件，用于批量操作
 ```
 
 ### 构建JS
@@ -49,18 +47,17 @@ ytpm src/css/page/demo.less
 ytpm src/css
 ```
 
-### 构建图片、embed
+### 构建图片
 
 ```bash
 ytpm src/img/demo.png
-ytpm src/embed/storage.html
 ytpm src/img
 ```
 
-### 批量构建
+### 压缩打包后的代码
 
 ```bash
-ytpm project/TUILIB-65.txt
+ytpm min build/js/g.js
 ```
 
 ### 指定配置
