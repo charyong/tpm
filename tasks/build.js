@@ -101,7 +101,7 @@ exports.run = function(args, config) {
 
 	// 优化图片
 	function optimizeImg(distPath) {
-		if (!/\.(png|jpg|jpeg|png|gif|svg)$/i.test(distPath)) {
+		if (!/\.(png|jpg|jpeg|gif)$/i.test(distPath)) {
 			return;
 		}
 
