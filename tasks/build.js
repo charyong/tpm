@@ -55,6 +55,10 @@ exports.run = function(args, config) {
 			return config.main.css.indexOf(relativePath) >= 0;
 		}
 
+		if (/\.tpl$/.test(path)) {
+			return false;
+		}
+
 		return /\.[a-z]+$/.test(path);
 	}
 
