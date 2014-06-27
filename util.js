@@ -208,7 +208,7 @@ function setSvnKeywords(path) {
 		path = [path];
 	}
 
-	path.map(function(p) {
+	path = path.map(function(p) {
 		return '"' + p.replace(/\\/g, '\\\\') + '"';
 	});
 
@@ -226,7 +226,7 @@ function setSvnAdd(path) {
 		return;
 	}
 
-	path.map(function(p) {
+	path = path.map(function(p) {
 		return '"' + p.replace(/\\/g, '\\\\') + '"';
 	});
 
