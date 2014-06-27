@@ -46,7 +46,6 @@ function error(str) {
 function indir(path, dirPath) {
 	path = Path.resolve(path);
 	dirPath = Path.resolve(dirPath);
-
 	return path.indexOf(dirPath) == 0;
 }
 
@@ -182,12 +181,40 @@ function concatFile(fromPaths, toPath, charset) {
 	info('File "' + toPath + '" created.' + linefeed);
 }
 
+function execSvn(cmd, stdoutFn, stderrFn, closeFn) {
+	info('svn ' + cmd);
+	var command = '';
+	if (process.platform === 'win32') {
+		command = 'set LANG=en_US & ';
+	} else {
+		command = 'export LANG=en_US; ';
+	}
+	command += 'svn ' + cmd;
+	var cp = ChildProcess.exec(command);
+	cp.stdout.on('data', function(stdout) {
+		stdoutFn && stdoutFn(stdout);
+	});
+	cp.stderr.on('data', function(stderr){
+		error('[SVN] ' + stderr);
+		stderrFn && stderrFn(stderr);
+	});
+	cp.on('close', function() {
+		closeFn && closeFn();
+	});
+}
+
 function setSvnKeywords(path) {
-	var cmd = 'svn propset svn:keywords "Rev LastChangedDate Author URL" "' + path.replace(/\\/g, '\\\\') + '"';
+	if(!Array.isArray(path)){
+		path = [path];
+	}
 
-	console.log(cmd);
+	path.map(function(p) {
+		return '"' + p.replace(/\\/g, '\\\\') + '"';
+	});
 
-	ChildProcess.exec(cmd);
+	execSvn(['propset', 'svn:keywords', '"Rev LastChangedDate Author URL"'].concat(path).join(' '), function(data) {
+		info(data);
+	});
 }
 
 function setSvnAdd(path) {
@@ -195,9 +222,16 @@ function setSvnAdd(path) {
 		path = [path];
 	}
 
-	var child = ChildProcess.spawn('svn', ['add'].concat(path));
-	child.stdout.on('data', function(data){
-		console.log('svn add:\n' + data);
+	if (path.length < 1) {
+		return;
+	}
+
+	path.map(function(p) {
+		return '"' + p.replace(/\\/g, '\\\\') + '"';
+	});
+
+	execSvn(['add'].concat(path).join(' '), function(data) {
+		info(data);
 	});
 }
 

@@ -8,9 +8,9 @@ var Request = require('request');
 
 var Util = require(__dirname + '/../util');
 
-var DIFF_USAGE = 'Usage: tpm list [REVISION]\n\n' +
+var DIFF_USAGE = 'Usage: ytpm list [REVISION]\n\n' +
 	'Examples:\n' +
-	'tpm list 28464\n';
+	'ytpm list 28464\n';
 
 // Open new mail window and insert file list
 function openEmail(config, projectName, paths, callback) {

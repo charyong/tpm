@@ -28,6 +28,10 @@ exports.run = function(args, config) {
 
 		var filePath = Path.resolve(jsDirPath + '/' + relativePath);
 
+		if (!Fs.existsSync(filePath)) {
+			return;
+		}
+
 		var globalIdList = /^(module|page|lazy)\/mobile\//.test(relativePath) ? mobileGlobal : global;
 
 		var depList = Util.grepDepList(filePath, jsDirPath, false);

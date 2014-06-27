@@ -142,7 +142,8 @@ exports.run = function(args, config) {
 			if (url.charAt(0) == '.') {
 				path = Path.resolve(dirPath + '/' + url);
 			} else if (url.charAt(0) == '/') {
-				path = Path.resolve(config.root + '/../' + url);
+				url = url.replace(/^\/[^\/]+/, '');
+				path = Path.resolve(config.root + url);
 			}
 			path = getSrcPath(path);
 			return path;
@@ -215,8 +216,7 @@ exports.run = function(args, config) {
 			Util.concatFile(fromPaths, path);
 			Util.copyFile(path, buildPath);
 			Util.minJs(buildPath, distPath);
-			Util.setSvnKeywords(buildPath);
-			Util.setSvnKeywords(distPath);
+			Util.setSvnKeywords([buildPath, distPath]);
 			return;
 		}
 
@@ -242,8 +242,7 @@ exports.run = function(args, config) {
 		var content = Util.buildJs(path, ignore);
 		Util.writeFileSync(buildPath, content);
 		Util.minJs(buildPath, distPath);
-		Util.setSvnKeywords(buildPath);
-		Util.setSvnKeywords(distPath);
+		Util.setSvnKeywords([buildPath, distPath]);
 	}
 
 	// 构建一个LESS文件
@@ -268,8 +267,7 @@ exports.run = function(args, config) {
 			renameAssets(path, content, function(content) {
 				Util.writeFileSync(buildPath, Util.banner + content);
 				Util.minCss(buildPath, distPath);
-				Util.setSvnKeywords(buildPath);
-				Util.setSvnKeywords(distPath);
+				Util.setSvnKeywords([buildPath, distPath]);
 			});
 		});
 	}
