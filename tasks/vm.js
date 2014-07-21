@@ -2,12 +2,15 @@ var Path = require('path');
 var Fs = require('fs');
 var Ssh = require('ssh2');
 var client = require('scp2');
+var Optimist = require('optimist');
 
 var Util = require(__dirname + '/../util');
 
-var DEPLOY_USAGE = 'Usage: ytpm vm [vmPath] [ENV]\n\n' +
+Optimist.usage('Usage: ytpm vm [vmPath] [ENV]\n\n' +
 	'Examples:\n' +
-	'ytpm vm viewX.vm wwwtest\n';
+	'ytpm vm viewX.vm wwwtest')
+	.demand([1, 2])
+	.argv;
 
 
 function connectManage3(sshConfig){
@@ -129,15 +132,9 @@ function __lettersToLowercase(path){
 
 
 exports.run = function(args, config) {
-	if (args.length < 2) {
-		console.log(DEPLOY_USAGE);
-		return;
-	}
+	var env = args.pop(); // 最后一个参数为环境 为一次上传多模板做准备
 
-	var env = args.pop(); // 最后一个参数为环境
-	var index  = 0, len = args.length;
-
-	var path = Path.resolve(args[index]);
+	var path = Path.resolve(args[0]); // 模板路径
 	var serverEnv = getServerEnv(path, env, config);
 
 	if(serverEnv){

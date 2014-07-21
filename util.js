@@ -7,6 +7,7 @@ var _ = require('underscore');
 var UglifyJS = require('uglify-js');
 var CleanCss = require('clean-css');
 var ChildProcess = require('child_process');
+var SLICE = Array.prototype.slice;
 
 var linefeed = process.platform === 'win32' ? '\r\n' : '\n';
 
@@ -32,15 +33,18 @@ function undef(val, defaultVal) {
 }
 
 function info(str) {
-	console.info('\033[36m', str, '\033[0m');
+	var args = SLICE.call(arguments, 1);
+	console.info.apply(console, ['\033[36m'+ str +'\033[0m'].concat(args));
 }
 
 function warn(str) {
-	console.warn('\033[33m', str, '\033[0m');
+	var args = SLICE.call(arguments, 1);
+	console.info.apply(console, ['\033[33m'+ str +'\033[0m'].concat(args));
 }
 
 function error(str) {
-	console.error('\033[31m', str, '\033[0m');
+	var args = SLICE.call(arguments, 1);
+	console.info.apply(console, ['\033[31m'+ str +'\033[0m'].concat(args));
 }
 
 function indir(path, dirPath) {

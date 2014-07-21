@@ -11,6 +11,7 @@ var TASK_MAP = {
 	cleanup : true,
 	check : true,
 	vm : true,
+	iconfont : true,
 };
 
 Optimist.usage([
