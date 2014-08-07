@@ -7,6 +7,8 @@ var _ = require('underscore');
 var UglifyJS = require('uglify-js');
 var CleanCss = require('clean-css');
 var ChildProcess = require('child_process');
+var Crypto = require('crypto');
+
 var SLICE = Array.prototype.slice;
 
 var linefeed = process.platform === 'win32' ? '\r\n' : '\n';
@@ -236,82 +238,6 @@ function setSvnAdd(path) {
 
 	execSvn(['add'].concat(path).join(' '), function(data) {
 		info(data);
-	});
-}
-
-// @param type: "src", "build", "dist"
-function readProjectFile(config, path, type) {
-	var content = Fs.readFileSync(path, 'utf-8');
-
-	var paths = content.trim().split(/\r\n|\n/);
-
-	var pathList = [];
-
-	for (var i = 0, len = paths.length; i < len; i++) {
-		var path = paths[i].trim();
-
-		if (path == '' || path.charAt(0) == '#') {
-			continue;
-		}
-
-		path = path.replace(/^(src|build|dist)\//, '');
-
-		if (type == 'src') {
-			path = path.replace(/\.css$/, '.less');
-		} else {
-			path = path.replace(/\.less$/, '.css');
-		}
-
-		path = Path.resolve(config.root + '/' + type + '/' + path);
-
-		if (!Fs.existsSync(path)) {
-			error('File not found: ' + path);
-			continue;
-		}
-
-		pathList.push(path);
-	}
-
-	return pathList;
-}
-
-// Escape mailto string
-// Reference: http://support.microsoft.com/kb/287573
-function escapeMailto(str) {
-	str = str.replace(/ /g, '%20');
-	str = str.replace(/,/g, '%2C');
-	str = str.replace(/\?/g, '%3F');
-	str = str.replace(/\./g, '%2E');
-	str = str.replace(/!/g, '%21');
-	str = str.replace(/:/g, '%3A');
-	str = str.replace(/;/g, '%3B');
-	str = str.replace(/&/g, '%26');
-	str = str.replace(/\r\n|\n/g, '%0D%0A');
-	return str;
-}
-
-// Open new mail window
-// Reference: http://support.microsoft.com/kb/287573
-function newMail(to, subject, body, callback) {
-	// mailto:<to email>?cc=<cc email>&bcc=<bcc mail>&subject=<subject text>&body=<body text>
-	var mailto = to + '?subject=' + escapeMailto(subject) + '&body=' + escapeMailto(body);
-
-	cmd = 'start mailto:"' + mailto + '"';
-
-	//grunt.log.write(cmd + '\n');
-
-	var mailProcess = ChildProcess.exec(cmd);
-
-	mailProcess.stdout.on('data', function(stdout) {
-		console.log('[MAILTO] ' + stdout);
-	});
-
-	mailProcess.stderr.on('data', function(stderr) {
-		error('[MAILTO] ' + stderr);
-	});
-
-	mailProcess.on('close', function() {
-		callback && callback();
 	});
 }
 
@@ -596,6 +522,20 @@ function buildJs(path, ignore) {
 	return content;
 }
 
+function isGitRepo(root) {
+	var repoPath = Path.join(root, '.git');
+	var headPath = Path.join(repoPath, 'HEAD');
+	return Fs.existsSync(headPath) && /^ref: /.test(readFileSync(headPath, 'utf-8'));
+}
+
+function md5(data, len){
+	var md5sum = Crypto.createHash('md5');
+	var encoding = typeof data === 'string' ? 'utf8' : 'binary';
+	md5sum.update(data, encoding);
+	len = len || 7;
+	return md5sum.digest('hex').substring(0, len);
+}
+
 exports.linefeed = linefeed;
 exports.banner = banner;
 exports.each = each;
@@ -614,10 +554,10 @@ exports.minCss = minCss;
 exports.concatFile = concatFile;
 exports.setSvnKeywords = setSvnKeywords;
 exports.setSvnAdd = setSvnAdd;
-exports.readProjectFile = readProjectFile;
-exports.newMail = newMail;
 exports.grepPaths = grepPaths;
 exports.fixModule = fixModule;
 exports.grepDepList = grepDepList;
 exports.grepModuleList = grepModuleList;
 exports.buildJs = buildJs;
+exports.isGitRepo = isGitRepo;
+exports.md5 = md5;

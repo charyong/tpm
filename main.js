@@ -20,7 +20,6 @@ Optimist.usage([
 	'ytpm src/js/g.js\n',
 	'ytpm src/css/g.less\n',
 	'ytpm min build/js/g.js\n',
-	'ytpm list 100\n',
 	'ytpm cleanup\n',
 ].join(''));
 

@@ -10,6 +10,8 @@ var Util = require(__dirname + '/../util');
 
 exports.run = function(args, config) {
 
+	var IS_GIT = Util.isGitRepo(config.root);
+
 	// 转换成相对路径
 	function getRelativePath(path, type) {
 		var dirPath = Path.resolve(config.root + (type ? ('/src/' + type) : '/src'));
@@ -63,12 +65,23 @@ exports.run = function(args, config) {
 	}
 
 	// 取得文件SVN版本号
-	function getSvnVersion(pathList, callback) {
+	function getFileVersion(pathList, callback) {
 		pathList = _.uniq(pathList);
 
 		var pathCount = pathList.length;
 
 		var result = {};
+
+		// 取得文件MD5
+		if (IS_GIT) {
+			pathList.forEach(function(path) {
+				var content = Util.readFileSync(path);
+				var md5 = Util.md5(content);
+				result[path] = md5;
+			});
+			callback(result);
+			return;
+		}
 
 		pathList.forEach(function(path) {
 			var cmd = 'svn info "' + path.replace(/\\/g, '\\\\') + '" --xml';
@@ -168,7 +181,7 @@ exports.run = function(args, config) {
 			callback(content);
 			return;
 		}
-		getSvnVersion(pathList, function(data) {
+		getFileVersion(pathList, function(data) {
 			content = content.replace(/\/\*[\S\s]*?\*\/|(url\(["']?)([^'"\)]+)(["']?\))/g, function(full, prefix, url, suffix) {
 				if (prefix) {
 					var path = url2path(url);
@@ -194,7 +207,7 @@ exports.run = function(args, config) {
 					svnAddList.push(distPath);
 				}
 			});
-			if(config.autoSvnAdd === true){
+			if(!IS_GIT && config.autoSvnAdd === true){
 				Util.setSvnAdd(svnAddList);
 			}
 
@@ -216,7 +229,9 @@ exports.run = function(args, config) {
 			Util.concatFile(fromPaths, path);
 			Util.copyFile(path, buildPath);
 			Util.minJs(buildPath, distPath);
-			Util.setSvnKeywords([buildPath, distPath]);
+			if (!IS_GIT) {
+				Util.setSvnKeywords([buildPath, distPath]);
+			}
 			return;
 		}
 
@@ -242,7 +257,9 @@ exports.run = function(args, config) {
 		var content = Util.buildJs(path, ignore);
 		Util.writeFileSync(buildPath, content);
 		Util.minJs(buildPath, distPath);
-		Util.setSvnKeywords([buildPath, distPath]);
+		if (!IS_GIT) {
+			Util.setSvnKeywords([buildPath, distPath]);
+		}
 	}
 
 	// 构建一个LESS文件
@@ -267,7 +284,9 @@ exports.run = function(args, config) {
 			renameAssets(path, content, function(content) {
 				Util.writeFileSync(buildPath, Util.banner + content);
 				Util.minCss(buildPath, distPath);
-				Util.setSvnKeywords([buildPath, distPath]);
+				if (!IS_GIT) {
+					Util.setSvnKeywords([buildPath, distPath]);
+				}
 			});
 		});
 	}
