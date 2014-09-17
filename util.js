@@ -187,60 +187,6 @@ function concatFile(fromPaths, toPath, charset) {
 	info('File "' + toPath + '" created.' + linefeed);
 }
 
-function execSvn(cmd, stdoutFn, stderrFn, closeFn) {
-	info('svn ' + cmd);
-	var command = '';
-	if (process.platform === 'win32') {
-		command = 'set LANG=en_US & ';
-	} else {
-		command = 'export LANG=en_US; ';
-	}
-	command += 'svn ' + cmd;
-	var cp = ChildProcess.exec(command);
-	cp.stdout.on('data', function(stdout) {
-		stdoutFn && stdoutFn(stdout);
-	});
-	cp.stderr.on('data', function(stderr){
-		error('[SVN] ' + stderr);
-		stderrFn && stderrFn(stderr);
-	});
-	cp.on('close', function() {
-		closeFn && closeFn();
-	});
-}
-
-function setSvnKeywords(path) {
-	if(!Array.isArray(path)){
-		path = [path];
-	}
-
-	path = path.map(function(p) {
-		return '"' + p.replace(/\\/g, '\\\\') + '"';
-	});
-
-	execSvn(['propset', 'svn:keywords', '"Rev LastChangedDate Author URL"'].concat(path).join(' '), function(data) {
-		info(data);
-	});
-}
-
-function setSvnAdd(path) {
-	if(!Array.isArray(path)){
-		path = [path];
-	}
-
-	if (path.length < 1) {
-		return;
-	}
-
-	path = path.map(function(p) {
-		return '"' + p.replace(/\\/g, '\\\\') + '"';
-	});
-
-	execSvn(['add'].concat(path).join(' '), function(data) {
-		info(data);
-	});
-}
-
 // Grep target paths
 function grepPaths(rootDirPath, checkFn) {
 	var paths = [];
@@ -522,12 +468,6 @@ function buildJs(path, ignore) {
 	return content;
 }
 
-function isGitRepo(root) {
-	var repoPath = Path.join(root, '.git');
-	var headPath = Path.join(repoPath, 'HEAD');
-	return Fs.existsSync(headPath) && /^ref: /.test(readFileSync(headPath, 'utf-8'));
-}
-
 function md5(data, len){
 	var md5sum = Crypto.createHash('md5');
 	var encoding = typeof data === 'string' ? 'utf8' : 'binary';
@@ -552,12 +492,9 @@ exports.copyFile = copyFile;
 exports.minJs = minJs;
 exports.minCss = minCss;
 exports.concatFile = concatFile;
-exports.setSvnKeywords = setSvnKeywords;
-exports.setSvnAdd = setSvnAdd;
 exports.grepPaths = grepPaths;
 exports.fixModule = fixModule;
 exports.grepDepList = grepDepList;
 exports.grepModuleList = grepModuleList;
 exports.buildJs = buildJs;
-exports.isGitRepo = isGitRepo;
 exports.md5 = md5;

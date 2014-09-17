@@ -10,8 +10,6 @@ var Util = require(__dirname + '/../util');
 
 exports.run = function(args, config) {
 
-	var IS_GIT = Util.isGitRepo(config.root);
-
 	// 转换成相对路径
 	function getRelativePath(path, type) {
 		var dirPath = Path.resolve(config.root + (type ? ('/src/' + type) : '/src'));
@@ -57,14 +55,14 @@ exports.run = function(args, config) {
 			return config.main.css.indexOf(relativePath) >= 0;
 		}
 
-		if (/\.tpl$/.test(path)) {
+		if (/\.(tpl|vm|sh|bat|cmd)$/.test(path)) {
 			return false;
 		}
 
 		return /\.[a-z]+$/.test(path);
 	}
 
-	// 取得文件SVN版本号
+	// 取得文件MD5
 	function getFileVersion(pathList, callback) {
 		pathList = _.uniq(pathList);
 
@@ -73,47 +71,13 @@ exports.run = function(args, config) {
 		var result = {};
 
 		// 取得文件MD5
-		if (IS_GIT) {
-			pathList.forEach(function(path) {
-				var content = Util.readFileSync(path);
-				var md5 = Util.md5(content);
-				result[path] = md5;
-			});
-			callback(result);
-			return;
-		}
-
 		pathList.forEach(function(path) {
-			var cmd = 'svn info "' + path.replace(/\\/g, '\\\\') + '" --xml';
-
-			console.log(cmd);
-
-			var cp = ChildProcess.exec(cmd);
-
-			cp.stdout.on('data', function(stdout) {
-				var data = Iconv.fromEncoding(stdout, 'gbk');
-				var match;
-				if ((match = /<commit\s+revision="(\d+)">/i.exec(data))) {
-					var value = match[1];
-				}
-
-				result[path] = value;
-
-				pathCount--;
-				if (pathCount === 0) {
-					setTimeout(function(){
-						callback(result);
-					}, 10);
-				}
-			});
-
-			cp.stderr.on('data', function(stderr){
-				result[path] = null;
-
-				pathCount--;
-				Util.error('[SVN] get info failed, please commit "' + path + '"');
-			});
+			var content = Util.readFileSync(path);
+			var md5 = Util.md5(content);
+			result[path] = md5;
 		});
+
+		callback(result);
 	}
 
 	// 优化图片
@@ -173,7 +137,7 @@ exports.run = function(args, config) {
 		while((match = regExp.exec(newContent))) {
 			var url = match[1];
 			var path = url2path(url);
-			if (path && Util.indir(path, Path.resolve(config.root))) {
+			if (path && Util.indir(path, config.root + '/src') && Fs.existsSync(path)) {
 				pathList.push(path);
 			}
 		}
@@ -193,7 +157,6 @@ exports.run = function(args, config) {
 				return full;
 			});
 
-			var svnAddList = [];
 			_.each(data, function(version, path) {
 				var distPath = getDistPath(path);
 
@@ -204,12 +167,8 @@ exports.run = function(args, config) {
 				if (!Fs.existsSync(distPath) || Util.mtime(path) >= Util.mtime(distPath)) {
 					Util.copyFile(path, distPath);
 					optimizeImg(distPath);
-					svnAddList.push(distPath);
 				}
 			});
-			if(!IS_GIT && config.autoSvnAdd === true){
-				Util.setSvnAdd(svnAddList);
-			}
 
 			callback(content);
 		});
@@ -229,9 +188,6 @@ exports.run = function(args, config) {
 			Util.concatFile(fromPaths, path);
 			Util.copyFile(path, buildPath);
 			Util.minJs(buildPath, distPath);
-			if (!IS_GIT) {
-				Util.setSvnKeywords([buildPath, distPath]);
-			}
 			return;
 		}
 
@@ -257,9 +213,6 @@ exports.run = function(args, config) {
 		var content = Util.buildJs(path, ignore);
 		Util.writeFileSync(buildPath, content);
 		Util.minJs(buildPath, distPath);
-		if (!IS_GIT) {
-			Util.setSvnKeywords([buildPath, distPath]);
-		}
 	}
 
 	// 构建一个LESS文件
@@ -284,9 +237,6 @@ exports.run = function(args, config) {
 			renameAssets(path, content, function(content) {
 				Util.writeFileSync(buildPath, Util.banner + content);
 				Util.minCss(buildPath, distPath);
-				if (!IS_GIT) {
-					Util.setSvnKeywords([buildPath, distPath]);
-				}
 			});
 		});
 	}
