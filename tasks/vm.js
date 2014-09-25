@@ -48,6 +48,7 @@ function uploadTemplate(mgr3, config, path){
 		host: mgr3.host,
 		username: mgr3.user,
 		password: mgr3.pass,
+		port: mgr3.port || 22,
 		path: mgr3.root
 	};
 
@@ -64,7 +65,7 @@ function uploadTemplate(mgr3, config, path){
 		manage3.on('ready', function(){
 
 			var remotePath = config.root + relativePath;
-			var cmd = ['scp', fileName, config.user + '@' + config.host + ':' + remotePath].join(' ');
+			var cmd = ['scp', '-P ' + (config.port || 22), fileName, config.user + '@' + config.host + ':' + remotePath].join(' ');
 
 			Util.info('[SCP] ' + path + ' -> ' + remotePath);
 
