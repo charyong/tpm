@@ -434,6 +434,8 @@ function buildJs(path, ignore) {
 
 	var content = banner;
 
+	content += '\n(function($) {\n\n';
+
 	if (!isLazy) {
 		content += '\nrequire.config({ enable_ozma: true });\n\n\n';
 	}
@@ -464,6 +466,8 @@ function buildJs(path, ignore) {
 	str = fixModule(path, str);
 	str = replaceTemplate(path, str);
 	content += '\n' + str;
+
+	content += '\n\n})(window.jQuery);\n';
 
 	return content;
 }
