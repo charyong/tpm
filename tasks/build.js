@@ -81,8 +81,9 @@ exports.run = function(args, config) {
 	}
 
 	// 优化图片
-	function optimizeImg(distPath) {
+	function optimizeImg(distPath, callback) {
 		if (!/\.(png|jpg|jpeg|gif)$/i.test(distPath)) {
+			callback();
 			return;
 		}
 
@@ -99,6 +100,7 @@ exports.run = function(args, config) {
 		imagemin.optimize(function (err, data) {
 			if (err) {
 				Util.error('[imagemin] optimize failed, ' + err);
+				callback();
 				return;
 			}
 
@@ -106,6 +108,7 @@ exports.run = function(args, config) {
 			var savedMsg = saved > 0 ? 'saved ' + (Math.round(saved / 1024 * 100) / 100) + 'KB' : 'already optimized';
 
 			Util.info('[imagemin] ' + distPath + ' : ' + savedMsg);
+			callback();
 		});
 	}
 
@@ -165,8 +168,10 @@ exports.run = function(args, config) {
 				}
 
 				if (!Fs.existsSync(distPath) || Util.mtime(path) >= Util.mtime(distPath)) {
-					Util.copyFile(path, distPath);
-					optimizeImg(distPath);
+					Util.copyFile(path, buildPath);
+					optimizeImg(buildPath, function() {
+						Util.copyFile(buildPath, distPath);
+					});
 				}
 			});
 
@@ -243,9 +248,12 @@ exports.run = function(args, config) {
 
 	// 构建一个图片文件
 	function buildImg(path) {
+		var buildPath = getBuildPath(path);
 		var distPath = getDistPath(path);
-		Util.copyFile(path, distPath);
-		optimizeImg(distPath);
+		Util.copyFile(path, buildPath);
+		optimizeImg(buildPath, function() {
+			Util.copyFile(buildPath, distPath);
+		});
 	}
 
 	// 构建多个文件
