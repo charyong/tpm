@@ -161,6 +161,7 @@ exports.run = function(args, config) {
 			});
 
 			_.each(data, function(version, path) {
+				var buildPath = getBuildPath(path);
 				var distPath = getDistPath(path);
 
 				if (version) {
