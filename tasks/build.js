@@ -165,10 +165,11 @@ exports.run = function(args, config) {
 				var distPath = getDistPath(path);
 
 				if (version) {
+					buildPath = addVersion(buildPath, version);
 					distPath = addVersion(distPath, version);
 				}
 
-				if (!Fs.existsSync(distPath) || Util.mtime(path) >= Util.mtime(distPath)) {
+				if (!Fs.existsSync(buildPath) || Util.mtime(path) >= Util.mtime(buildPath)) {
 					Util.copyFile(path, buildPath);
 					optimizeImg(buildPath, function() {
 						Util.copyFile(buildPath, distPath);
