@@ -1,3 +1,4 @@
+// 问
 var Path = require('path');
 var Fs = require('fs');
 var Ssh = require('ssh2');
@@ -38,8 +39,8 @@ function connectManage3(sshConfig){
 	return ssh;
 }
 
-
-function uploadTemplate(mgr3, config, path){
+// 通过代理上传模板
+function uploadTemplate4Mgr3(mgr3, config, path){
 
 	var fileName = Path.basename(path);
 	var relativePath = Path.relative(config.localRoot, path).split(Path.sep).join('/');
@@ -93,6 +94,30 @@ function uploadTemplate(mgr3, config, path){
 	});
 }
 
+
+function uploadTemplate(config, path){
+
+	var fileName = Path.basename(path);
+	var relativePath = Path.relative(config.localRoot, path).split(Path.sep).join('/');
+
+	var options = {
+		host: config.host,
+		username: config.user,
+		password: config.pass,
+		port: config.port || 22,
+		path: config.root + relativePath
+	};
+
+	client.scp(path, options, function(err){
+		if (err) {
+			Util.error('[Upload VM] failed:' + err);
+			return;
+		}
+
+		Util.info('[Upload VM] '+ path +' success');
+	});
+}
+
 // 通过地址获取对应环境参数
 function getServerEnv(path, env, config){
 	var PROJECTS = config.project
@@ -139,7 +164,11 @@ exports.run = function(args, config) {
 	var serverEnv = getServerEnv(path, env, config);
 
 	if(serverEnv){
-		uploadTemplate(config.ssh.manage3, serverEnv, path);
+		if(serverEnv.noManage3 === true){
+			uploadTemplate(serverEnv, path);
+		}else{
+			uploadTemplate4Mgr3(config.ssh.manage3, serverEnv, path);
+		}
 	}
 };
 
