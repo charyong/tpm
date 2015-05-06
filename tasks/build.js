@@ -128,7 +128,7 @@ exports.run = function(args, config) {
 	// 将JS代码改成AMD模块，包含路径转换，补充模块ID，模板转换等
 	function fixModule(path, str) {
 		var root = path.replace(/^(.*?)[\\\/](src|build|dist)[\\\/].*$/, '$1');
-		var jsReg = new RegExp( '^.+' + config.jsSrcPath.replace(/([\/.?%+])/g, function($0, $1){ return '\\' + $1 }) + '\/' );
+		var jsReg = new RegExp( '^.+' + config.jsSrcPath.replace(/\./g,'\\.').replace(/\:/g,'\\:') + '\/' );
 		var relativePath = path.split(Path.sep).join('/').replace(jsReg, '');
 		var mid = relativePath.replace(/\.js$/, '');
 
@@ -500,15 +500,26 @@ exports.run = function(args, config) {
 		});
 	}
 
+	// 构建其它文件
+	function buildOther(path) {
+		var buildPath = getBuildPath(path);
+		var distPath = getDistPath(path);
+		Util.copyFile(path, buildPath);
+	}
+
 	// 构建多个文件
 	function buildFiles(pathList) {
 		pathList.forEach(function(path) {
-			if (/\.js$/.test(path)) {
+			if(/\.(html?|bat|cmd|sh)$/i.test(path)){ // 过虑掉不构建的文件
+				return;
+			}else if (/\.js$/i.test(path)) {
 				buildJs(path);
-			} else if (/\.less$/.test(path)) {
+			} else if (/\.less$/i.test(path)) {
 				buildLess(path);
-			} else {
+			} else if(/\.(png|jpg|jpeg|gif)$/i.test(path)) {
 				buildImg(path);
+			}else{
+				buildOther(path);
 			}
 		});
 	}
