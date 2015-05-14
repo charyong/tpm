@@ -1,4 +1,5 @@
 var Path = require('path');
+var Os = require('os');
 var Fs = require('fs');
 var Iconv = require('iconv-lite');
 var _ = require('underscore');
@@ -44,7 +45,6 @@ exports.run = function(args, config) {
 		if (!Util.indir(path, Path.resolve(config.root + '/src'))) {
 			return false;
 		}
-
 		if (/\.js$/.test(path)) {
 			var relativePath = getRelativePath(path, config.jsSrcPath);
 			// console.log('canBuild', path, relativePath)
@@ -430,10 +430,16 @@ exports.run = function(args, config) {
 		var distPath = getDistPath(path);
 
 		// 把多个文件合并成一个文件
-		if (config.libjs[relativePath]) {
-			var fromPaths = config.libjs[relativePath].map(function(val) {
+		var libjsList = config.libjs[relativePath];
+		if (libjsList) {
+			var fromPaths = libjsList.map(function(val) {
 				return Path.resolve(config.root + config.jsSrcPath + '/' + val);
 			});
+			// 生成文件出现在引入列表中时不覆盖当前
+			// 防止合并后的文件多次引入同一个子文件
+			if(libjsList.indexOf(relativePath) > -1){ 
+				path = Os.tmpdir() + '/tpm_' + (+new Date) + Math.random();
+			}
 			Util.concatFile(fromPaths, path);
 			Util.copyFile(path, buildPath);
 			Util.minJs(buildPath, distPath);
