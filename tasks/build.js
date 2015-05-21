@@ -561,12 +561,22 @@ exports.run = function(args, config) {
 
 		// grep ignore module
 		var jsDirPath = config.root + config.jsSrcPath;
-		if (Fs.existsSync(jsDirPath + '/g.js')) {
-			config.ignore = grepDepList(jsDirPath + '/g.js', jsDirPath, true);
-		}
-		if (Fs.existsSync(jsDirPath + '/m.js')) {
-			config.mobileIgnore = grepDepList(jsDirPath + '/m.js', jsDirPath, true);
-		}
+		config.ignore = [];
+		config.mobileIgnore = [];
+		config.ignoreJs.forEach(function(path) {
+			var fullPath = jsDirPath + '/' + path;
+			if (Fs.existsSync(fullPath)) {
+				var pathList = grepDepList(fullPath, jsDirPath, true);
+				config.ignore = config.ignore.concat(pathList);
+			}
+		});
+		config.ignoreMobileJs.forEach(function(path) {
+			var fullPath = jsDirPath + '/' + path;
+			if (Fs.existsSync(fullPath)) {
+				var pathList = grepDepList(fullPath, jsDirPath, true);
+				config.mobileIgnore = config.mobileIgnore.concat(pathList);
+			}
+		});
 
 		buildFiles(pathList);
 	}
