@@ -450,7 +450,7 @@ exports.run = function(args, config) {
 		var relativePath = getRelativePath(path, config.jsSrcPath);
 
 		if (config.globaljs.indexOf(relativePath) < 0) {
-			if (/^(module|page|lazy)\/mobile\//.test(relativePath)) {
+			if (/^((module|page|lazy)\/)?mobile\//.test(relativePath)) {
 				var ignore = config.mobileIgnore || [];
 			} else {
 				var ignore = config.ignore || [];
