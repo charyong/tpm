@@ -6,6 +6,7 @@ var _ = require('underscore');
 var Less = require('less');
 var Imagemin = require('imagemin');
 var ChildProcess = require('child_process');
+var ReactTools = require('react-tools');
 
 var Util = require(__dirname + '/../util');
 
@@ -466,6 +467,7 @@ exports.run = function(args, config) {
 		});
 
 		var content = buildJsUtil(path, ignore);
+		content = ReactTools.transform(content, { harmony: true });
 		Util.writeFileSync(buildPath, content);
 		Util.minJs(buildPath, distPath);
 	}
