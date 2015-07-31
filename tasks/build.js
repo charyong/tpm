@@ -4,9 +4,12 @@ var Fs = require('fs');
 var Iconv = require('iconv-lite');
 var _ = require('underscore');
 var Less = require('less');
-var Imagemin = require('imagemin');
 var ChildProcess = require('child_process');
 var ReactTools = require('react-tools');
+var autoprefixer = require('autoprefixer');
+var cssnext = require('cssnext');
+var cssgrace = require('../cssgrace');
+
 
 var Util = require(__dirname + '/../util');
 
@@ -80,38 +83,6 @@ exports.run = function(args, config) {
 		});
 
 		callback(result);
-	}
-
-	// 优化图片
-	function optimizeImg(distPath, callback) {
-		if (!/\.(png|jpg|jpeg|gif)$/i.test(distPath)) {
-			callback();
-			return;
-		}
-
-		var srcContent = Util.readFileSync(distPath);
-
-		var imagemin = new Imagemin()
-			.src(srcContent)
-			.dest(distPath)
-			.use(Imagemin.gifsicle())
-			.use(Imagemin.jpegtran(true))
-			.use(Imagemin.optipng({ optimizationLevel: 3 }))
-			.use(Imagemin.svgo({plugins: [{removeViewBox: false}]}));
-
-		imagemin.optimize(function (err, data) {
-			if (err) {
-				Util.error('[imagemin] optimize failed, ' + err);
-				callback();
-				return;
-			}
-
-			var saved = srcContent.length - data.contents.length;
-			var savedMsg = saved > 0 ? 'saved ' + (Math.round(saved / 1024 * 100) / 100) + 'KB' : 'already optimized';
-
-			Util.info('[imagemin] ' + distPath + ' : ' + savedMsg);
-			callback();
-		});
 	}
 
 	function resolveUrl(url) {
@@ -414,9 +385,7 @@ exports.run = function(args, config) {
 
 				if (!Fs.existsSync(buildPath) || Util.mtime(path) >= Util.mtime(buildPath)) {
 					Util.copyFile(path, buildPath);
-					optimizeImg(buildPath, function() {
-						Util.copyFile(buildPath, distPath);
-					});
+					Util.copyFile(buildPath, distPath);
 				}
 			});
 
@@ -438,7 +407,7 @@ exports.run = function(args, config) {
 			});
 			// 生成文件出现在引入列表中时不覆盖当前
 			// 防止合并后的文件多次引入同一个子文件
-			if(libjsList.indexOf(relativePath) > -1){ 
+			if(libjsList.indexOf(relativePath) > -1){
 				path = Os.tmpdir() + '/tpm_' + (+new Date) + Math.random();
 			}
 			Util.concatFile(fromPaths, path);
@@ -490,6 +459,8 @@ exports.run = function(args, config) {
 				return Util.error(err);
 			}
 			content = tree.toCSS();
+			content = postcss([autoprefixer, cssnext, cssgrace]).process(content).css;
+
 
 			renameAssets(path, content, function(content) {
 				Util.writeFileSync(buildPath, Util.banner + content);
@@ -503,9 +474,7 @@ exports.run = function(args, config) {
 		var buildPath = getBuildPath(path);
 		var distPath = getDistPath(path);
 		Util.copyFile(path, buildPath);
-		optimizeImg(buildPath, function() {
-			Util.copyFile(buildPath, distPath);
-		});
+		Util.copyFile(buildPath, distPath);
 	}
 
 	// 构建其它文件

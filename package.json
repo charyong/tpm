@@ -1,6 +1,6 @@
 {
   "name": "tpm",
-  "version": "1.4.10",
+  "version": "1.4.11",
   "description": "Static Package Manager",
   "author": "Longhao Luo <lhluo@tudou.com>",
   "license": "GPL",
@@ -23,8 +23,6 @@
     "gulp-iconfont": "^0.1.1",
     "gulp-svgmin": "^0.4.6",
     "iconv-lite": "~0.2.5",
-    "imagemin": "~0.4.6",
-    "jpegtran-bin": "~0.2.0",
     "jsftp": "~0.5.9",
     "less": "~1.4.0-b2",
     "optimist": "~0.3.5",
@@ -34,6 +32,9 @@
     "ssh2": "~0.2.5",
     "uglify-js": "~2.3.6",
     "underscore": "~1.4.4",
-	"react-tools": "~0.13.3"
+    "postcss": "~4.1.16",
+    "autoprefixer": "~5.2.0",
+    "cssnext": "~1.8.2",
+    "react-tools": "~0.13.3"
   }
 }
