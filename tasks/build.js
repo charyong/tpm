@@ -8,6 +8,7 @@ var ChildProcess = require('child_process');
 var ReactTools = require('react-tools');
 var autoprefixer = require('autoprefixer');
 var cssnext = require('cssnext');
+var postcss = require('postcss');
 var cssgrace = require('../cssgrace');
 
 
